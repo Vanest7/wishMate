@@ -5,6 +5,7 @@ import com.gifts.demo.common.annotation.DomainTransactional;
 import com.gifts.demo.common.exception.ForbiddenOperationException;
 import com.gifts.demo.common.exception.ResourceAlreadyExistsException;
 import com.gifts.demo.common.exception.ResourceNotFoundException;
+import com.gifts.demo.common.exception.ValidationException;
 import com.gifts.demo.domain.model.Event;
 import com.gifts.demo.domain.model.GiftReservation;
 import com.gifts.demo.domain.model.User;
@@ -19,6 +20,7 @@ import com.gifts.demo.domain.service.GiftReservationService;
 import com.gifts.demo.domain.service.GroupPermissionService;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 
 @DomainService
@@ -32,6 +34,45 @@ public class GiftReservationServiceImpl
     private final UserRepository userRepository;
     private final GroupPermissionService groupPermissionService;
     private final EventStateService eventStateService;
+
+    @Override
+    public GiftReservation getById(
+            Integer reservationId,
+            Integer requesterId
+    ) {
+        GiftReservation reservation =
+                giftReservationRepository.findById(reservationId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Reservation with id "
+                                                + reservationId
+                                )
+                        );
+
+        if (reservation.getUser() == null
+                || !requesterId.equals(
+                reservation.getUser().getId()
+        )) {
+            throw new ForbiddenOperationException(
+                    "User " + requesterId
+                            + " cannot access reservation "
+                            + reservationId
+            );
+        }
+
+        return reservation;
+    }
+
+    @Override
+    public List<GiftReservation> getMyReservations(Integer requesterId) {
+        if (requesterId == null) {
+            throw new ValidationException(
+                    "Requester id cannot be null"
+            );
+        }
+
+        return giftReservationRepository.findByUserId(requesterId);
+    }
 
     @Override
     @DomainTransactional

@@ -114,6 +114,15 @@ public class GiftReservationDaoJpa
     }
 
     @Override
+    public List<GiftReservation> findByUserId(Integer userId) {
+        return giftReservationJpaRepository
+                .findByUser_Id(userId)
+                .stream()
+                .map(GiftReservationJpaMapper.INSTANCE::toGiftReservation)
+                .toList();
+    }
+
+    @Override
     public boolean existsByWishId(Integer wishId) {
         return giftReservationJpaRepository
                 .existsByWish_Id(wishId);

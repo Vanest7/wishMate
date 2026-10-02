@@ -9,6 +9,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -42,6 +43,11 @@ public class GiftReservationRepositoryImpl
                 wishId,
                 userId
         );
+    }
+
+    @Override
+    public List<GiftReservation> findByUserId(Integer userId) {
+        return giftReservationDaoDb.findByUserId(userId);
     }
 
     @Override

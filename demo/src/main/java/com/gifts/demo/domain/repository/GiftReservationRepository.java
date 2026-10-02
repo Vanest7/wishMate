@@ -2,6 +2,7 @@ package com.gifts.demo.domain.repository;
 
 import com.gifts.demo.domain.model.GiftReservation;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface GiftReservationRepository {
@@ -14,6 +15,8 @@ public interface GiftReservationRepository {
             Integer wishId,
             Integer userId
     );
+
+    List<GiftReservation> findByUserId(Integer userId);
 
     boolean existsByWishId(Integer wishId);
 

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
 
 import java.time.LocalDateTime;
 
@@ -31,6 +33,7 @@ public class GiftReservationEntity {
     )
     private WishEntity wish;
 
+    @Generated(event = EventType.INSERT)
     @Column(
             name = "fecha_reserva",
             nullable = false,

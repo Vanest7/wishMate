@@ -14,6 +14,7 @@ public final class WishWebMapper {
 
     public static Wish toWish(CreateWishRequest request) {
         return Wish.builder()
+                .name(request.name())
                 .description(request.description())
                 .purchaseUrl(request.purchaseUrl())
                 .estimatedPrice(request.estimatedPrice())
@@ -22,6 +23,7 @@ public final class WishWebMapper {
 
     public static Wish toWish(UpdateWishRequest request) {
         return Wish.builder()
+                .name(request.name())
                 .description(request.description())
                 .purchaseUrl(request.purchaseUrl())
                 .estimatedPrice(request.estimatedPrice())
@@ -37,6 +39,7 @@ public final class WishWebMapper {
                 wish.getEvent() != null
                         ? wish.getEvent().getId()
                         : null,
+                wish.getName(),
                 wish.getDescription(),
                 wish.getPurchaseUrl(),
                 wish.getEstimatedPrice()

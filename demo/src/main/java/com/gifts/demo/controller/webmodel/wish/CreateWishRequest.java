@@ -8,10 +8,16 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 public record CreateWishRequest(
-        @NotBlank(message = "Wish description is required")
+        @NotBlank(message = "Wish name is required")
         @Size(
-                max = 255,
-                message = "Wish description must not exceed 255 characters"
+                max = 150,
+                message = "Wish name must not exceed 150 characters"
+        )
+        String name,
+
+        @Size(
+                max = 500,
+                message = "Wish description must not exceed 500 characters"
         )
         String description,
 

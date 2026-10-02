@@ -18,6 +18,7 @@ public class Wish {
     private Integer id;
     private User user;
     private Event event;
+    private String name;
     private String description;
     private String purchaseUrl;
     private BigDecimal estimatedPrice;

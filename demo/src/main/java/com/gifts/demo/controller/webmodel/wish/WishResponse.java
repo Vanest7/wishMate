@@ -6,6 +6,7 @@ public record WishResponse(
         Integer id,
         Integer userId,
         Integer eventId,
+        String name,
         String description,
         String purchaseUrl,
         BigDecimal estimatedPrice

@@ -27,6 +27,9 @@ public class WishEntity {
     @JoinColumn(name = "id_evento")
     private EventEntity event;
 
+    @Column(name = "nombre", nullable = false, length = 150)
+    private String name;
+
     @Column(name = "descripcion", nullable = false, length = 255)
     private String description;
 

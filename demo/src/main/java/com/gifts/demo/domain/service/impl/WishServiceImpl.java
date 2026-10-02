@@ -142,6 +142,9 @@ public class WishServiceImpl implements WishService {
                 requesterId
         );
 
+        currentWish.setName(
+                wish.getName()
+        );
         currentWish.setDescription(
                 wish.getDescription()
         );
@@ -248,6 +251,20 @@ public class WishServiceImpl implements WishService {
             );
         }
 
+        String name = wish.getName();
+
+        if (name == null || name.isBlank()) {
+            throw new ValidationException(
+                    "Wish name cannot be empty"
+            );
+        }
+
+        if (name.length() > 150) {
+            throw new ValidationException(
+                    "Wish name must not exceed 150 characters"
+            );
+        }
+
         String description = wish.getDescription();
 
         if (description == null || description.isBlank()) {
@@ -288,6 +305,7 @@ public class WishServiceImpl implements WishService {
             }
         }
 
+        wish.setName(name.strip());
         wish.setDescription(description.strip());
     }
 }

@@ -3,12 +3,15 @@ package com.gifts.demo.persistence.dao.db.jpa.repository;
 import com.gifts.demo.persistence.dao.db.jpa.entity.GiftReservationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface GiftReservationJpaRepository
         extends JpaRepository<GiftReservationEntity, Integer> {
 
     Optional<GiftReservationEntity> findByWish_Id(Integer wishId);
+
+    List<GiftReservationEntity> findByUser_Id(Integer userId);
 
     boolean existsByWish_Id(Integer wishId);
 
