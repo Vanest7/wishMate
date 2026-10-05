@@ -1,0 +1,15 @@
+{
+  "name": "wishmate-backend",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Development commands for the WishMate Spring Boot backend",
+  "scripts": {
+    "start": "cd demo && SPRING_PROFILES_ACTIVE=dev bash ./mvnw spring-boot:run",
+    "test": "cd demo && SPRING_PROFILES_ACTIVE=dev bash ./mvnw test",
+    "test:clean": "cd demo && SPRING_PROFILES_ACTIVE=dev bash ./mvnw clean test",
+    "test:controllers": "cd demo && SPRING_PROFILES_ACTIVE=dev bash ./mvnw test '-Dtest=*ControllerTest'",
+    "compile": "cd demo && bash ./mvnw compile",
+    "build": "cd demo && SPRING_PROFILES_ACTIVE=dev bash ./mvnw clean package",
+    "clean": "cd demo && bash ./mvnw clean"
+  }
+}
