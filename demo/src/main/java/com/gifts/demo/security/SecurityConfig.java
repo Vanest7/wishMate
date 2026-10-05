@@ -25,6 +25,7 @@ public class SecurityConfig {
                 );
 
         return http
+                .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )

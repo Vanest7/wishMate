@@ -23,8 +23,8 @@ public class WishEntity {
     @JoinColumn(name = "id_usuario", nullable = false)
     private UserEntity user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_evento")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_evento", nullable = false)
     private EventEntity event;
 
     @Column(name = "nombre", nullable = false, length = 150)

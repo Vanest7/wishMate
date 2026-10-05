@@ -15,9 +15,10 @@ public record CreateWishRequest(
         )
         String name,
 
+        @NotBlank(message = "Wish description is required")
         @Size(
-                max = 500,
-                message = "Wish description must not exceed 500 characters"
+                max = 255,
+                message = "Wish description must not exceed 255 characters"
         )
         String description,
 
