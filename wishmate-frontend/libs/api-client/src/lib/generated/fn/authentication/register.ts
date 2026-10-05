@@ -26,7 +26,9 @@ export function register(
   }
 
   return http
-    .request(rb.build({ responseType: 'blob', accept: '*/*', context }))
+    .request(
+      rb.build({ responseType: 'json', accept: 'application/json', context }),
+    )
     .pipe(
       filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
       map((r: HttpResponse<any>) => {

@@ -13,7 +13,6 @@ export type { CreateEventRequest } from './models/create-event-request';
 export type { CreateGroupRequest } from './models/create-group-request';
 export type { CreateWishRequest } from './models/create-wish-request';
 export type { CsrfResponse } from './models/csrf-response';
-export type { CsrfToken } from './models/csrf-token';
 export type { ErrorResponse } from './models/error-response';
 export type { EventResponse } from './models/event-response';
 export type { GiftReservationResponse } from './models/gift-reservation-response';

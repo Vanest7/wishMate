@@ -25,6 +25,7 @@ import com.gifts.demo.domain.usecase.event.UpdateEventUseCase;
 import com.gifts.demo.security.currentUser.CurrentUserProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +41,10 @@ import java.util.List;
 
 @Tag(name = "Events")
 @RestController
-@RequestMapping("/api/groups/{groupId}/events")
+@RequestMapping(
+        value = "/api/groups/{groupId}/events",
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
 @RequiredArgsConstructor
 public class EventController {
 

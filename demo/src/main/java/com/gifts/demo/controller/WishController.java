@@ -25,6 +25,7 @@ import com.gifts.demo.security.currentUser.CurrentUserProvider;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +42,10 @@ import java.util.List;
 
 @Tag(name = "Wishes")
 @RestController
-@RequestMapping("/api/groups/{groupId}/events/{eventId}/wishes")
+@RequestMapping(
+        value = "/api/groups/{groupId}/events/{eventId}/wishes",
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class WishController {

@@ -8,25 +8,23 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { CsrfResponse } from '../../models/csrf-response';
-import { CsrfToken } from '../../models/csrf-token';
 
-export interface GetCsrfToken$Params {
-  csrfToken: CsrfToken;
-}
+export interface GetCsrfToken$Params {}
 
 export function getCsrfToken(
   http: HttpClient,
   rootUrl: string,
-  params: GetCsrfToken$Params,
+  params?: GetCsrfToken$Params,
   context?: HttpContext,
 ): Observable<StrictHttpResponse<CsrfResponse>> {
   const rb = new RequestBuilder(rootUrl, getCsrfToken.PATH, 'get');
   if (params) {
-    rb.query('csrfToken', params.csrfToken, {});
   }
 
   return http
-    .request(rb.build({ responseType: 'blob', accept: '*/*', context }))
+    .request(
+      rb.build({ responseType: 'json', accept: 'application/json', context }),
+    )
     .pipe(
       filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
       map((r: HttpResponse<any>) => {

@@ -20,6 +20,7 @@ import com.gifts.demo.domain.usecase.reservation.GetMyGiftReservationsUseCase;
 import com.gifts.demo.security.currentUser.CurrentUserProvider;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +35,10 @@ import java.util.List;
 
 @Tag(name = "Gift reservations")
 @RestController
-@RequestMapping("/api/reservations")
+@RequestMapping(
+        value = "/api/reservations",
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class GiftReservationController {

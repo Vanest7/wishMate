@@ -122,7 +122,7 @@ export class AuthenticationService extends BaseService {
    * This method doesn't expect any request body.
    */
   getCsrfToken$Response(
-    params: GetCsrfToken$Params,
+    params?: GetCsrfToken$Params,
     context?: HttpContext,
   ): Observable<StrictHttpResponse<CsrfResponse>> {
     const obs = getCsrfToken(this.http, this.rootUrl, params, context);
@@ -140,7 +140,7 @@ export class AuthenticationService extends BaseService {
    * This method doesn't expect any request body.
    */
   getCsrfToken(
-    params: GetCsrfToken$Params,
+    params?: GetCsrfToken$Params,
     context?: HttpContext,
   ): Observable<CsrfResponse> {
     const resp = this.getCsrfToken$Response(params, context);

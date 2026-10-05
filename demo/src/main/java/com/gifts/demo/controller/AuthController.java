@@ -2,6 +2,7 @@ package com.gifts.demo.controller;
 
 import com.gifts.demo.controller.exception.ApiExceptionHandler.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,6 +25,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -37,7 +39,10 @@ import java.time.Duration;
 
 @Tag(name = "Authentication")
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(
+        value = "/api/auth",
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -91,7 +96,9 @@ public class AuthController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/csrf")
-    public ResponseEntity<CsrfResponse> getCsrfToken(CsrfToken csrfToken) {
+    public ResponseEntity<CsrfResponse> getCsrfToken(
+            @Parameter(hidden = true) CsrfToken csrfToken
+    ) {
         CsrfResponse response = new CsrfResponse(
                 csrfToken.getHeaderName(),
                 csrfToken.getToken()

@@ -24,6 +24,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +32,10 @@ import java.util.List;
 
 @Tag(name = "Group members")
 @RestController
-@RequestMapping("/api/groups/{groupId}/members")
+@RequestMapping(
+        value = "/api/groups/{groupId}/members",
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class GroupMemberController {
