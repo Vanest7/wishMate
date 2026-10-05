@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -70,6 +71,7 @@ class AuthControllerTest {
     private JwtDecoder jwtDecoder;
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void shouldProvideCsrfTokenWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/api/auth/csrf"))
                 .andExpect(status().isOk())
@@ -79,7 +81,8 @@ class AuthControllerTest {
                 ))
                 .andExpect(jsonPath("$.headerName")
                         .value("X-XSRF-TOKEN"))
-                .andExpect(jsonPath("$.token").isNotEmpty());
+                .andExpect(jsonPath("$.token").isNotEmpty())
+                .andExpect(cookie().exists("XSRF-TOKEN"));
 
         verifyNoInteractions(
                 registerUserUseCase,
