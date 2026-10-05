@@ -11,5 +11,8 @@
     "compile": "cd demo && bash ./mvnw compile",
     "build": "cd demo && SPRING_PROFILES_ACTIVE=dev bash ./mvnw clean package",
     "clean": "cd demo && bash ./mvnw clean"
+  },
+  "dependencies": {
+    "24": "^0.0.0"
   }
 }
