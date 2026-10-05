@@ -1,2 +1,5 @@
 #!/bin/sh
+
+cd wishmate-frontend || exit 1
+
 npm run format:check && npm run lint

@@ -15,7 +15,7 @@
     "graph": "nx graph",
     "reset": "nx reset",
     "report": "nx report",
-    "prepare": "husky",
+    "prepare": "cd .. && husky wishmate-frontend/.husky",
     "test": "nx test wishmate --watch=false",
     "test:watch": "nx test wishmate --watch=true",
     "api:generate": "ng-openapi-gen --config ng-openapi-gen.json && prettier --write libs/api-client/src/lib/generated"
