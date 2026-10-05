@@ -34,6 +34,10 @@
       "linter": "eslint",
       "style": "scss",
       "unitTestRunner": "vitest"
+    },
+    "@nx/angular:library": {
+      "linter": "eslint",
+      "unitTestRunner": "none"
     }
   }
 }

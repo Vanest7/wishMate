@@ -14,5 +14,8 @@
   },
   "dependencies": {
     "24": "^0.0.0"
+  },
+  "devDependencies": {
+    "ng-openapi-gen": "1.1.0"
   }
 }

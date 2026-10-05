@@ -11,14 +11,14 @@
     "lint:fix": "nx run-many --target=lint --fix",
     "format": "nx format:write --all",
     "format:check": "nx format:check --all",
-    "check": "npm run format:check && npm run lint && npm run build",
+    "check": "npm run format:check && npm run lint && npm test && npm run build",
     "graph": "nx graph",
     "reset": "nx reset",
     "report": "nx report",
     "prepare": "husky",
     "test": "nx test wishmate --watch=false",
     "test:watch": "nx test wishmate --watch=true",
-    "check": "npm run format:check && npm run lint && npm test && npm run build"
+    "api:generate": "ng-openapi-gen --config ng-openapi-gen.json && prettier --write libs/api-client/src/lib/generated"
   },
   "private": true,
   "dependencies": {
@@ -57,6 +57,7 @@
     "eslint-config-prettier": "^10.0.0",
     "husky": "^9.1.7",
     "jsdom": "^30.1.2",
+    "ng-openapi-gen": "1.1.0",
     "nx": "23.2.1",
     "postcss": "^8.5.29",
     "prettier": "~3.6.2",

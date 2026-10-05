@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/ng-openapi-gen/ng-openapi-gen-schema.json",
+  "input": "openapi/wishmate.json",
+  "output": "libs/api-client/src/lib/generated",
+  "services": true,
+  "promises": false,
+  "module": false,
+  "indexFile": true
+}
