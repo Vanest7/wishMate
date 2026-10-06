@@ -4,3 +4,17 @@
 @import 'tailwindcss/utilities.css' layer(utilities);
 
 @source "./";
+
+@theme {
+  --color-brand-navy: #0b2545;
+  --color-brand-coral: #ff626b;
+  --color-brand-coral-dark: #b83245;
+  --color-brand-teal: #087f83;
+  --color-brand-cream: #fff2d5;
+
+  --color-page: #fafaf7;
+  --color-card: #ffffff;
+  --color-content: #0b2545;
+  --color-content-muted: #526174;
+  --color-divider: #dce2e8;
+}

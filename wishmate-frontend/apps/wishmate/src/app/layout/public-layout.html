@@ -1,0 +1,85 @@
+<a class="skip-link" href="#main-content">{{ content.navigation.skipToContent }}</a>
+
+<header class="header">
+  <div class="header-content">
+    <a routerLink="/" [attr.aria-label]="content.navigation.home" class="brand">
+      <img
+        src="/WishMate_ regalos compartidos con corazón.png"
+        [alt]="content.footer.brand"
+        class="brand-logo"
+      />
+    </a>
+
+    <nav class="navigation" aria-label="Access">
+      <a
+        routerLink="/auth/login"
+        routerLinkActive="is-active"
+        ariaCurrentWhenActive="page"
+        queryParamsHandling="preserve"
+      >
+        {{ content.navigation.login }}
+      </a>
+
+      <a
+        routerLink="/auth/register"
+        routerLinkActive="is-active"
+        ariaCurrentWhenActive="page"
+        queryParamsHandling="preserve"
+      >
+        {{ content.navigation.register }}
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="main-content" class="main" tabindex="-1">
+  <section class="welcome" aria-labelledby="welcome-title">
+    <span class="eyebrow">
+      <span class="eyebrow-dot" aria-hidden="true"></span>
+      {{ content.welcome.eyebrow }}
+    </span>
+
+    <h2 id="welcome-title" class="welcome-title">
+      {{ content.welcome.title }}
+      <span>{{ content.welcome.highlight }}</span>
+    </h2>
+
+    <p class="welcome-description">
+      {{ content.welcome.description }}
+    </p>
+
+    <ul class="features">
+      @for (feature of content.features; track feature.id; let index = $index) {
+        <li>
+      <span class="feature-number" aria-hidden="true">
+        {{ index + 1 < 10 ? '0' : '' }}{{ index + 1 }}
+      </span>
+
+          <div>
+            <h3>{{ feature.title }}</h3>
+            <p>{{ feature.description }}</p>
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <div class="access-area">
+    <div class="decoration decoration-cream" aria-hidden="true"></div>
+    <div class="decoration decoration-coral" aria-hidden="true"></div>
+
+    <section class="access-card" [attr.aria-label]="content.access.label">
+      <div class="card-accent" aria-hidden="true"></div>
+      <router-outlet />
+    </section>
+
+    <p class="access-note">
+      {{ content.access.note }}
+    </p>
+  </div>
+</main>
+
+<footer class="footer">
+  <span>{{ content.footer.brand }}</span>
+  <span>{{ content.footer.tagline }}</span>
+</footer>
