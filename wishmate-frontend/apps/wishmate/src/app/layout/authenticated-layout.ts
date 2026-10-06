@@ -4,7 +4,6 @@ import {
   effect,
   inject,
 } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import {
   Router,
   RouterLink,
@@ -15,37 +14,39 @@ import { SessionService } from '../core/auth/session.service';
 
 @Component({
   selector: 'app-authenticated-layout',
-  imports: [MatButtonModule, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrl: './authenticated-layout.scss',
   template: `
-    <a class="sr-only focus:not-sr-only" href="#main-content"
-      >Saltar al contenido</a
-    >
-    <header
-      class="flex flex-wrap items-center justify-between gap-4 border-b p-4"
-    >
-      <a routerLink="/groups" class="text-xl font-bold">WishMate</a>
-      <nav aria-label="Navegación principal" class="flex flex-wrap gap-2">
-        <a
-          mat-button
-          routerLink="/groups"
-          routerLinkActive="font-bold"
-          ariaCurrentWhenActive="page"
-          >Mis grupos</a
-        >
-        <a
-          mat-button
-          routerLink="/reservations"
-          routerLinkActive="font-bold"
-          ariaCurrentWhenActive="page"
-          >Mis reservas</a
-        >
-        <button mat-button type="button" (click)="logout()">
-          Cerrar sesión
-        </button>
-      </nav>
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
+    <header class="header">
+      <div class="header-content">
+        <a routerLink="/groups" aria-label="Ir a mis grupos" class="brand">
+          <img
+            src="/WishMate_ regalos compartidos con corazón.png"
+            alt="WishMate"
+            class="brand-logo"
+          />
+        </a>
+
+        <nav class="navigation" aria-label="Navegación principal">
+          <a
+            routerLink="/groups"
+            routerLinkActive="is-active"
+            ariaCurrentWhenActive="page"
+            >Mis grupos</a
+          >
+          <a
+            routerLink="/reservations"
+            routerLinkActive="is-active"
+            ariaCurrentWhenActive="page"
+            >Mis reservas</a
+          >
+          <button type="button" (click)="logout()">Cerrar sesión</button>
+        </nav>
+      </div>
     </header>
-    <main id="main-content" tabindex="-1" class="mx-auto max-w-5xl p-6">
+    <main id="main-content" tabindex="-1" class="main">
       <router-outlet />
     </main>
   `,
