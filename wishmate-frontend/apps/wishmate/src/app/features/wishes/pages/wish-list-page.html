@@ -75,65 +75,16 @@
 } @else {
 <ul class="wish-grid">
   @for (card of cards(); track card.wish.id) {
-  <li class="wish-card">
-    <p class="owner" [class.mine]="card.isMine">
-      {{ card.isMine ? content.yours : content.owner + ' ' + card.ownerName }}
-    </p>
-    <h2>{{ card.wish.name }}</h2>
-    <p class="description wish-description">{{ card.wish.description }}</p>
-    @if (card.wish.estimatedPrice !== undefined && card.wish.estimatedPrice !==
-    null) {
-    <p class="price">
-      <span>{{ content.estimatedPrice }}</span><strong>{{ card.price }}</strong>
-    </p>
-    }
-    <div class="card-actions">
-      @if (card.purchaseHref) {
-      <a
-        mat-stroked-button
-        [href]="card.purchaseHref"
-        target="_blank"
-        rel="noopener noreferrer"
-        >{{ content.openLink }}<span class="visually-hidden"
-          >: {{ card.wish.name }}</span
-        ></a
-      >
-      } @else if (card.wish.purchaseUrl) {
-      <p class="link-note">{{ content.invalidStoredUrl }}</p>
-      } @if (!card.isMine && canCreate()) {
-      <a
-        mat-flat-button
-        [routerLink]="['/reservations/new', current.group.id, current.event.id, card.wish.id]"
-        [attr.aria-label]="'Reservar regalo: ' + card.wish.name"
-        >Reservar regalo</a
-      >
-      } @if (card.canManage) {
-      <div class="owner-actions">
-        <button
-          mat-button
-          type="button"
-          (click)="edit('edit', card.wish)"
-          [disabled]="dialogOpen()"
-          [attr.aria-label]="content.edit + ': ' + card.wish.name"
-        >
-          {{ content.edit }}
-        </button>
-        <button
-          mat-icon-button
-          class="delete-action"
-          type="button"
-          (click)="edit('delete', card.wish)"
-          [disabled]="dialogOpen()"
-          [attr.aria-label]="content.delete + ': ' + card.wish.name"
-          [title]="content.delete"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
-          </svg>
-        </button>
-      </div>
-      }
-    </div>
+  <li>
+    <app-wish-card
+      [model]="card"
+      [groupId]="current.group.id"
+      [eventId]="current.event.id"
+      [canReserve]="canCreate()"
+      [disabled]="dialogOpen()"
+      (editRequested)="edit('edit', card.wish)"
+      (deleteRequested)="edit('delete', card.wish)"
+    />
   </li>
   }
 </ul>

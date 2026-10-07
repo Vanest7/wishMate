@@ -159,4 +159,28 @@ describe('My reservations', () => {
       'Todavía no tienes reservas',
     );
   });
+  it('wires the card action and announces a pending cancellation only once', async () => {
+    const fixture = TestBed.createComponent(ReservationListPage);
+    await fixture.whenStable();
+    const button = (
+      fixture.nativeElement as HTMLElement
+    ).querySelector<HTMLButtonElement>(
+      'button[aria-label="Cancelar reserva: Libro"]',
+    );
+    expect(button).not.toBeNull();
+    button?.click();
+    expect(open).toHaveBeenCalledOnce();
+    confirmed.next(true);
+    confirmed.complete();
+    await fixture.whenStable();
+    const announcements = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll(
+        '[role="status"]',
+      ),
+    ).filter((element) =>
+      element.textContent?.includes('Cancelando tu reserva'),
+    );
+    expect(announcements).toHaveLength(1);
+    expect(button?.disabled).toBe(true);
+  });
 });

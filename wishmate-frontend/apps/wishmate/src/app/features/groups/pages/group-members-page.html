@@ -4,7 +4,8 @@
 <p class="success" role="status">{{ success() }}</p>
 }
 <ul class="member-list">
-  @for (member of context().members; track member.userId) {
+  @for (card of memberCards(); track card.member.userId) { @let member =
+  card.member;
   <li>
     <span class="member-name"
       >{{ member.userName || content.unknownMember }}</span
@@ -14,7 +15,7 @@
         >{{ member.role ? content.roles[member.role] : content.unknownRole
         }}</span
       >
-      @if (canRemove(member)) {
+      @if (card.canRemove) {
       <button
         mat-icon-button
         type="button"

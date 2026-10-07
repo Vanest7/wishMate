@@ -80,7 +80,7 @@ describe('Add member dialog', () => {
     'preserves selection and permits retry after status %s',
     (status) => {
       const page = TestBed.createComponent(AddMemberDialog).componentInstance;
-      page.user.setValue({ id: 42, userName: 'Alex' });
+      page.user.setValue({ id: 42, userName: 'Alex', handle: 'alex' });
       page.submit();
       response.error(new HttpErrorResponse({ status }));
       expect(page.user.value).toEqual({
@@ -98,7 +98,7 @@ describe('Add member dialog', () => {
 
   it('shows server field validation and clears it on input changes', () => {
     const page = TestBed.createComponent(AddMemberDialog).componentInstance;
-    page.user.setValue({ id: 42, userName: 'Alex' });
+    page.user.setValue({ id: 42, userName: 'Alex', handle: 'alex' });
     page.submit();
     response.error(
       new HttpErrorResponse({
@@ -107,13 +107,17 @@ describe('Add member dialog', () => {
       }),
     );
     expect(page.user.hasError('server')).toBe(true);
-    page.user.setValue({ id: 43, userName: 'Ana' });
+    page.user.setValue({ id: 43, userName: 'Ana', handle: 'ana' });
     expect(page.user.valid).toBe(true);
   });
 
   it('unsubscribes when destroyed', () => {
     const fixture = TestBed.createComponent(AddMemberDialog);
-    fixture.componentInstance.user.setValue({ id: 42, userName: 'Alex' });
+    fixture.componentInstance.user.setValue({
+      id: 42,
+      userName: 'Alex',
+      handle: 'alex',
+    });
     fixture.componentInstance.submit();
     fixture.destroy();
     expect(response.observed).toBe(false);

@@ -1,3 +1,4 @@
+import { EventTransitionDialog } from '../ui/event-transition-dialog';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -110,15 +111,16 @@ export class EventDetailPage {
     if (!current || this.dialogOpen() || !canEventAction(current.status, mode))
       return;
     this.dialogOpen.set(true);
-    const ref = this.dialog.open<EventDialog, EventDialogData, ValidEvent>(
-      EventDialog,
-      {
-        data: { mode, groupId: current.groupId, event: current },
-        width: '620px',
-        maxWidth: 'calc(100vw - 32px)',
-        autoFocus: mode === 'edit' ? 'first-tabbable' : 'button',
-      },
-    );
+    const ref = this.dialog.open<
+      EventDialog | EventTransitionDialog,
+      EventDialogData,
+      ValidEvent
+    >(mode === 'edit' ? EventDialog : EventTransitionDialog, {
+      data: { mode, groupId: current.groupId, event: current },
+      width: '620px',
+      maxWidth: 'calc(100vw - 32px)',
+      autoFocus: mode === 'edit' ? 'first-tabbable' : 'button',
+    });
     const unregister = this.destroyRef.onDestroy(() => ref.close());
     ref
       .afterClosed()

@@ -1,3 +1,4 @@
+import { eventStatusLabels } from '../../shared/domain/event-status';
 export const eventsContent = {
   title: 'Eventos',
   description: 'Organiza las celebraciones y los regalos que compartiréis.',
@@ -57,12 +58,7 @@ export const eventsContent = {
   closed: 'Evento cerrado.',
   archived: 'Evento archivado.',
   wishes: 'Ver deseos',
-  states: {
-    DRAFT: 'Borrador',
-    ACTIVE: 'Activo',
-    CLOSED: 'Cerrado',
-    ARCHIVED: 'Archivado',
-  },
+  states: eventStatusLabels,
   stateDescriptions: {
     DRAFT:
       'Prepara los detalles. Activa el evento cuando queráis empezar a añadir deseos.',

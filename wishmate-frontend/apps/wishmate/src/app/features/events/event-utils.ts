@@ -1,8 +1,10 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { isEventStatus } from '../../shared/domain/event-status';
+import { apiErrorMessage } from '../../core/http/api-error';
 import { EventResponse, GroupResponse } from '@wishmate/api-client';
 import { eventsContent } from './events.content';
 
-export type EventStatus = NonNullable<EventResponse['status']>;
+import { EventStatus } from '../../shared/domain/event-status';
+export type { EventStatus } from '../../shared/domain/event-status';
 export type EventAction = 'edit' | 'activate' | 'close' | 'archive';
 export type ValidEvent = EventResponse & {
   id: number;
@@ -26,10 +28,7 @@ export function validEvent(
     event.groupId === groupId &&
     typeof event.name === 'string' &&
     !!event.name.trim() &&
-    (event.status === 'DRAFT' ||
-      event.status === 'ACTIVE' ||
-      event.status === 'CLOSED' ||
-      event.status === 'ARCHIVED')
+    isEventStatus(event.status)
   );
 }
 
@@ -66,20 +65,5 @@ export function formatEventDate(value: string | null | undefined): string {
 }
 
 export function eventError(error: unknown): string {
-  const content = eventsContent.errors;
-  if (!(error instanceof HttpErrorResponse)) return content.generic;
-  switch (error.status) {
-    case 0:
-      return content.network;
-    case 400:
-      return content.validation;
-    case 403:
-      return content.forbidden;
-    case 404:
-      return content.missing;
-    case 409:
-      return content.conflict;
-    default:
-      return content.generic;
-  }
+  return apiErrorMessage(error, eventsContent.errors);
 }

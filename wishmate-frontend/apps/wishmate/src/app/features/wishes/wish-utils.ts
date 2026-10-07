@@ -1,4 +1,7 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { isEventStatus } from '../../shared/domain/event-status';
+import { positiveId } from '../../shared/util/positive-id';
+export { positiveId } from '../../shared/util/positive-id';
+import { apiErrorMessage } from '../../core/http/api-error';
 import {
   EventResponse,
   GroupMemberResponse,
@@ -27,9 +30,6 @@ export interface WishPageData {
   members: GroupMemberResponse[];
 }
 
-export function positiveId(value: unknown): value is number {
-  return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
-}
 export function validWishEvent(
   event: EventResponse,
   groupId: number,
@@ -41,10 +41,7 @@ export function validWishEvent(
     event.groupId === groupId &&
     typeof event.name === 'string' &&
     !!event.name.trim() &&
-    (event.status === 'DRAFT' ||
-      event.status === 'ACTIVE' ||
-      event.status === 'CLOSED' ||
-      event.status === 'ARCHIVED')
+    isEventStatus(event.status)
   );
 }
 export function validWish(
@@ -110,20 +107,5 @@ export function formatPrice(price: number | null | undefined): string {
     : '—';
 }
 export function wishError(error: unknown): string {
-  const content = wishesContent.errors;
-  if (!(error instanceof HttpErrorResponse)) return content.generic;
-  switch (error.status) {
-    case 0:
-      return content.network;
-    case 400:
-      return content.validation;
-    case 403:
-      return content.forbidden;
-    case 404:
-      return content.missing;
-    case 409:
-      return content.conflict;
-    default:
-      return content.generic;
-  }
+  return apiErrorMessage(error, wishesContent.errors);
 }

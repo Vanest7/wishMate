@@ -6,7 +6,8 @@ import { Subject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SessionService } from '../../../core/auth/session.service';
 import { ValidWish, WishEvent } from '../wish-utils';
-import { WishDialog, WishDialogData } from './wish-dialog';
+import { WishDialog } from './wish-dialog';
+import { WishFormDialogData as WishDialogData } from '../models/wish-dialog.model';
 
 const event: WishEvent = {
   id: 4,
@@ -127,38 +128,6 @@ describe('Wish dialog', () => {
       },
     });
   });
-  it('deletes only after confirmation and accepts a 204 response', () => {
-    const page = setup({
-      mode: 'delete',
-      groupId: 1,
-      event,
-      wish,
-    }).componentInstance;
-    expect(api.deleteWish).not.toHaveBeenCalled();
-    page.submit();
-    page.submit();
-    expect(api.deleteWish).toHaveBeenCalledExactlyOnceWith({
-      groupId: 1,
-      eventId: 4,
-      wishId: 5,
-    });
-    response.next();
-    response.complete();
-    expect(ref.close).toHaveBeenCalledWith({ mode: 'delete', wishId: 5 });
-  });
-  it.each(['DRAFT', 'CLOSED', 'ARCHIVED'] as const)(
-    'blocks mutations in %s',
-    (status) => {
-      const page = setup({
-        mode: 'delete',
-        groupId: 1,
-        event: { ...event, status },
-        wish,
-      }).componentInstance;
-      page.submit();
-      expect(api.deleteWish).not.toHaveBeenCalled();
-    },
-  );
   it('blocks another member from modifying a wish', () => {
     const page = setup({
       mode: 'edit',

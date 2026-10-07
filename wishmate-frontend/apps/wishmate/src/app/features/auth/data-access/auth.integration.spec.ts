@@ -10,9 +10,9 @@ import {
 import { TestBed } from '@angular/core/testing';
 import { provideApiConfiguration } from '@wishmate/api-client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AuthService } from '../../features/auth/data-access/auth.service';
-import { authInterceptor } from './auth.interceptor';
-import { SessionService } from './session.service';
+import { AuthService } from './auth.service';
+import { authInterceptor } from '../../../core/auth/auth.interceptor';
+import { SessionService } from '../../../core/auth/session.service';
 
 const baseUrl = 'http://localhost:8080';
 
@@ -66,6 +66,7 @@ describe('Authentication HTTP integration', () => {
     auth
       .register({
         userName: 'Test',
+        handle: 'test_user',
         email: 'test@example.com',
         password: ' pass ',
       })
@@ -75,6 +76,7 @@ describe('Authentication HTTP integration', () => {
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual({
       userName: 'Test',
+      handle: 'test_user',
       email: 'test@example.com',
       password: ' pass ',
     });

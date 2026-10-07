@@ -5,21 +5,22 @@
 </header>
 <nav class="card-grid" aria-label="Accesos principales">
   @for (card of cards; track card.title) {
-    <app-navigation-card
-      [title]="card.title"
-      [description]="card.description"
-      [icon]="card.icon"
-      [destination]="card.destination"
-      [queryParams]="card.query"
-      [actionLabel]="card.action"
-      [style.--card-icon-color]="card.iconColor"
-      [style.--card-icon-background]="card.iconBackground"
-    />
+  <app-navigation-card
+    [title]="card.title"
+    [description]="card.description"
+    [icon]="card.icon"
+    [destination]="card.destination"
+    [queryParams]="card.query"
+    [actionLabel]="card.action"
+    [style.--card-icon-color]="card.iconColor"
+    [style.--card-icon-background]="card.iconBackground"
+  />
   }
 </nav>
 <section class="quick-access" aria-labelledby="quick-title">
   <h2 id="quick-title">
-    {{ section() === 'events' ? 'Acceso rápido a eventos' : 'Acceso rápido a deseos' }}
+    {{ section() === 'events' ? 'Acceso rápido a eventos' : 'Acceso rápido a
+    deseos' }}
   </h2>
   <p>Elige tu grupo y entra directamente al evento que buscas.</p>
   @if (groupsLoading()) {

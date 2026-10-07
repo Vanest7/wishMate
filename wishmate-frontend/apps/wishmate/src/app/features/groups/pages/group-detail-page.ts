@@ -1,3 +1,4 @@
+import { GroupsDataService } from '../data-access/groups-data.service';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -14,23 +15,17 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
-import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { GroupSettingsMenu } from '../ui/group-settings-menu';
 import { AddMemberDialog, AddMemberDialogData } from '../ui/add-member-dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import {
-  GroupResponse,
-  GroupMemberResponse,
-  GroupsService,
-  GroupMembersService,
-} from '@wishmate/api-client';
+import { GroupResponse, GroupMemberResponse } from '@wishmate/api-client';
 import {
   catchError,
   combineLatest,
   EMPTY,
-  forkJoin,
   startWith,
   Subject,
   switchMap,
@@ -38,7 +33,7 @@ import {
 } from 'rxjs';
 import { SessionService } from '../../../core/auth/session.service';
 import { groupsContent } from '../groups.content';
-import { groupError, groupPermissions, validGroup } from '../group-utils';
+import { groupError, groupPermissions } from '../group-utils';
 import {
   GroupDialog,
   GroupDialogData,
@@ -47,21 +42,21 @@ import {
 
 @Component({
   selector: 'app-group-detail-page',
+  providers: [GroupsDataService],
   imports: [
     RouterLink,
     RouterLinkActive,
     RouterOutlet,
     MatButtonModule,
     MatProgressBarModule,
-    MatMenuModule,
+    GroupSettingsMenu,
   ],
   templateUrl: './group-detail-page.html',
   styleUrl: './groups-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDetailPage {
-  private readonly api = inject(GroupsService);
-  private readonly membersApi = inject(GroupMembersService);
+  private readonly groupData = inject(GroupsDataService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
@@ -87,26 +82,6 @@ export class GroupDetailPage {
       members.filter((member) => member.userId !== userId),
     );
   };
-
-  private settingsCloseTimer: ReturnType<typeof setTimeout> | undefined;
-
-  openSettings(trigger: MatMenuTrigger): void {
-    this.cancelSettingsClose();
-    if (this.dialogOpen() || trigger.menuOpen) return;
-
-    trigger.openMenu();
-    trigger.menu?.focusFirstItem('mouse');
-  }
-
-  cancelSettingsClose(): void {
-    clearTimeout(this.settingsCloseTimer);
-    this.settingsCloseTimer = undefined;
-  }
-
-  scheduleSettingsClose(trigger: MatMenuTrigger): void {
-    this.cancelSettingsClose();
-    this.settingsCloseTimer = setTimeout(() => trigger.closeMenu(), 250);
-  }
 
   addMember(): void {
     const group = this.group();
@@ -137,7 +112,6 @@ export class GroupDetailPage {
   }
 
   constructor() {
-    this.destroyRef.onDestroy(() => this.cancelSettingsClose());
     this.destroyRef.onDestroy(() => clearTimeout(this.successTimer));
     combineLatest([this.route.paramMap, this.reload.pipe(startWith(undefined))])
       .pipe(
@@ -149,13 +123,8 @@ export class GroupDetailPage {
         }),
         switchMap(([params]) => {
           const groupId = Number(params.get('groupId'));
-          return forkJoin({
-            group: this.api.getGroup({ groupId }),
-            members: this.membersApi.getMembers({ groupId }),
-          }).pipe(
+          return this.groupData.getDetail(groupId).pipe(
             tap(({ group, members }) => {
-              if (!validGroup(group) || group.id !== groupId)
-                throw new Error('Invalid group response');
               this.group.set(group);
               this.members.set(members);
               this.loading.set(false);
