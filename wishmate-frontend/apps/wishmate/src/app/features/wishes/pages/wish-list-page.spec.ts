@@ -97,12 +97,19 @@ describe('Wish list', () => {
     expect(element.textContent).not.toContain('Secret Santa');
     expect(element.textContent?.toLowerCase()).not.toContain('reservad');
     expect(element.querySelectorAll('.delete-action').length).toBe(1);
+    expect(
+      element.querySelector('a[href="/reservations/new/1/4/6"]'),
+    ).not.toBeNull();
+    expect(
+      element.querySelector('a[href="/reservations/new/1/4/5"]'),
+    ).toBeNull();
     expect(element.querySelector('a[href^="javascript:"]')).toBeNull();
     expect(element.textContent).toContain('25,50');
     fixture.componentInstance.mineOnly.set(true);
     await fixture.whenStable();
     expect(element.textContent).toContain('Book');
     expect(element.textContent).not.toContain('Headphones');
+    expect(element.querySelector('a[href^="/reservations/new"]')).toBeNull();
   });
   it.each(['DRAFT', 'CLOSED', 'ARCHIVED'] as const)(
     'hides all write actions when %s',

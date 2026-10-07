@@ -1,0 +1,100 @@
+<header class="page-heading">
+  <div>
+    <p class="context">REGALOS QUE VAS A HACER</p>
+    <h1>Mis reservas</h1>
+    <p>
+      Aquí tienes los regalos de los que te vas a encargar. Solo tú puedes ver
+      esta lista.
+    </p>
+  </div>
+  <a
+    mat-stroked-button
+    routerLink="/dashboard"
+    [queryParams]="{ section: 'wishes' }"
+    >Buscar un regalo</a
+  >
+</header>
+@if (cancelling()) {
+<p role="status">Cancelando tu reserva…</p>
+} @if (loading()) {
+<div class="state">
+  <p role="status">Cargando tus reservas…</p>
+  <mat-progress-bar mode="indeterminate" />
+</div>
+} @else if (error()) {
+<div class="state">
+  <p role="alert">{{ error() }}</p>
+  <button mat-button type="button" (click)="retry()">Volver a intentar</button>
+</div>
+} @else { @if (success()) {
+<p class="success" role="status">{{ success() }}</p>
+} @if (actionError()) {
+<p class="error" role="alert">{{ actionError() }}</p>
+} @if (cards().length === 0) {
+<div class="state">
+  <h2>Todavía no tienes reservas</h2>
+  <p>
+    Elige un deseo de otra persona en un evento activo y confirma que quieres
+    encargarte de su regalo.
+  </p>
+  <a
+    mat-flat-button
+    routerLink="/dashboard"
+    [queryParams]="{ section: 'wishes' }"
+    >Ver deseos de mis grupos</a
+  >
+</div>
+} @else { @if (cancelling()) {
+<p role="status">Cancelando tu reserva…</p>
+}
+<ul class="reservation-grid">
+  @for (card of cards(); track card.reservation.id) {
+  <li class="reservation-card">
+    @if (card.target; as target) {
+    <p class="context">{{ target.group.name }} · {{ target.event.name }}</p>
+    <h2>{{ target.wish.name }}</h2>
+    <p class="description">{{ target.wish.description }}</p>
+    <p>
+      Evento: {{ target.event.status ? statusLabels[target.event.status] :
+      'Estado no disponible' }}
+    </p>
+    @if (card.date) {
+    <p>Reservado el {{ card.date }}</p>
+    }
+    <div class="actions">
+      <a
+        mat-button
+        [routerLink]="['/groups', target.group.id, 'events', target.event.id, 'wishes']"
+        >Ver deseos del evento</a
+      >
+      @if (canCancel(card)) {
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="busy()"
+        (click)="cancel(card)"
+        [attr.aria-label]="'Cancelar reserva: ' + target.wish.name"
+      >
+        Cancelar reserva
+      </button>
+      }
+    </div>
+    @if (!canCancel(card)) {
+    <p>La cancelación solo está disponible en eventos activos.</p>
+    } } @else {
+    <h2>Detalles de la reserva no disponibles</h2>
+    <p>
+      No hemos podido consultar este deseo. Puede que ya no tengas acceso al
+      grupo o que haya fallado la carga. La reserva no se ha cancelado.
+    </p>
+    @if (card.date) {
+    <p>Reservado el {{ card.date }}</p>
+    }
+    <button mat-button type="button" (click)="retry()" [disabled]="busy()">
+      Volver a consultar
+    </button>
+    }
+  </li>
+  }
+</ul>
+} }

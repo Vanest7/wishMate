@@ -100,6 +100,13 @@
       >
       } @else if (card.wish.purchaseUrl) {
       <p class="link-note">{{ content.invalidStoredUrl }}</p>
+      } @if (!card.isMine && canCreate()) {
+      <a
+        mat-flat-button
+        [routerLink]="['/reservations/new', current.group.id, current.event.id, card.wish.id]"
+        [attr.aria-label]="'Reservar regalo: ' + card.wish.name"
+        >Reservar regalo</a
+      >
       } @if (card.canManage) {
       <div class="owner-actions">
         <button

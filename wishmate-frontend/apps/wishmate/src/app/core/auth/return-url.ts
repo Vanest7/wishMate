@@ -4,7 +4,7 @@ export function safeReturnUrl(value: string | null): string {
   const pathname = value.split(/[?#]/, 1)[0];
   const id = '[1-9]\\d*';
   const allowed = new RegExp(
-    `^/(?:dashboard|reservations|groups(?:/${id}(?:/members|/events(?:/${id}(?:/wishes)?)?)?)?)/?$`,
+    `^/(?:dashboard|reservations(?:/new/${id}/${id}/${id})?|groups(?:/${id}(?:/members|/events(?:/${id}(?:/wishes)?)?)?)?)/?$`,
   );
   return allowed.test(pathname) ? value : '/dashboard';
 }

@@ -10,6 +10,7 @@ describe('safeReturnUrl', () => {
     '/groups/12',
     '/groups/12/members',
     '/reservations',
+    '/reservations/new/1/2/3',
     '/groups/12/events',
     '/groups/12/events/34/wishes?view=mine#list',
   ])('preserves the private destination %s', (url) =>

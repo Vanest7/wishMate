@@ -1,0 +1,44 @@
+<a mat-button routerLink="/reservations">← Mis reservas</a>
+<h1>Reservar un regalo</h1>
+@if (loading()) {
+<p role="status">Cargando el deseo…</p>
+<mat-progress-bar mode="indeterminate" />
+} @else { @if (target(); as current) {
+<article class="reservation-card">
+  <p class="context">{{ current.group.name }} · {{ current.event.name }}</p>
+  <h2>{{ current.wish.name }}</h2>
+  <p class="description">{{ current.wish.description }}</p>
+  @if (completed()) {
+  <p class="success" role="status">
+    Regalo reservado. El propietario del deseo no verá tu reserva.
+  </p>
+  <a mat-flat-button routerLink="/reservations">Ver mis reservas</a>
+  } @else if (current.event.status === 'ACTIVE') {
+  <p>
+    ¿Quieres encargarte de este regalo? Al confirmar comprobaremos que se puede
+    reservar.
+  </p>
+  <button
+    mat-flat-button
+    type="button"
+    (click)="reserve()"
+    [disabled]="pending()"
+  >
+    {{ pending() ? 'Reservando…' : 'Confirmar reserva' }}
+  </button>
+  @if (pending()) {
+  <p role="status">Guardando tu reserva…</p>
+  } } @else {
+  <p>Solo puedes reservar regalos en eventos activos.</p>
+  }
+  <a
+    mat-button
+    [routerLink]="['/groups', current.group.id, 'events', current.event.id, 'wishes']"
+    >Volver a los deseos</a
+  >
+</article>
+} @if (error()) {
+<p class="error" role="alert">{{ error() }}</p>
+} @if (!target()) {
+<button mat-button type="button" (click)="retry()">Volver a intentar</button> }
+}
