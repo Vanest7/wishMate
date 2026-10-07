@@ -1,0 +1,246 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host,
+:host::before,
+:host::after,
+:host *,
+:host *::before,
+:host *::after {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  margin-bottom: 16px;
+  font-size: clamp(1.9rem, 5vw, 3rem);
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+h2 {
+  font-size: 1.3rem;
+  line-height: 1.35;
+}
+
+.eyebrow {
+  margin-bottom: 12px;
+  color: var(--mat-sys-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.description,
+.group-card p {
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.7;
+}
+
+.page-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.page-heading > div {
+  min-width: 0;
+}
+
+.page-heading h1 {
+  margin-bottom: 12px;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.2;
+}
+
+.page-heading .description {
+  max-width: 60ch;
+  margin-bottom: 0;
+}
+
+.group-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 280px), 1fr)
+  );
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.group-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  padding: 28px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 24px;
+  background: var(--mat-sys-surface-container-lowest);
+}
+
+.group-card a {
+  margin-top: auto;
+}
+
+.card-icon,
+.illustration {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 24px;
+  border-radius: 16px;
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-tertiary);
+  font-size: 2rem;
+}
+
+.state {
+  padding: clamp(24px, 5vw, 56px);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 24px;
+  background: var(--mat-sys-surface-container-lowest);
+}
+
+.state p {
+  line-height: 1.7;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(24px, 4vw, 40px);
+  text-align: left;
+}
+
+.empty .illustration {
+  width: 48px;
+  height: 48px;
+  margin: 0 0 20px;
+  border-radius: 14px;
+}
+
+.empty h2 {
+  margin-bottom: 12px;
+}
+
+.empty p {
+  max-width: 52ch;
+  margin-bottom: 24px;
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.6;
+}
+
+.success {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.detail-hero {
+  margin-top: 24px;
+  padding: clamp(24px, 4vw, 40px);
+  border-radius: 28px;
+  background: var(--mat-sys-primary-container);
+}
+
+.actions {
+  margin-top: 24px;
+}
+
+.delete-action {
+  color: var(--mat-sys-tertiary);
+}
+
+.role {
+  display: inline-block;
+  max-width: 100%;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.section-navigation {
+  margin: 24px 0 32px;
+}
+
+.section-navigation [aria-current='page'] {
+  background: var(--mat-sys-secondary-container);
+}
+
+.count {
+  color: var(--mat-sys-secondary);
+}
+
+.member-list {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 20px;
+  list-style: none;
+}
+
+.member-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px;
+  background: var(--mat-sys-surface-container-lowest);
+}
+
+.member-list li + li {
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+.member-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .page-heading {
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .page-heading > button,
+  .actions button,
+  .empty button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .group-card {
+    padding: 24px;
+  }
+
+  .group-grid {
+    gap: 16px;
+  }
+
+  .section-navigation {
+    gap: 4px;
+  }
+}

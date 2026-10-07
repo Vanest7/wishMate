@@ -6,6 +6,8 @@ import {
   signal,
 } from '@angular/core';
 
+import { jwtSubject } from './jwt-subject';
+
 interface Session {
   accessToken: string;
   expiresAt: number;
@@ -15,6 +17,9 @@ interface Session {
 export class SessionService {
   private readonly session = signal<Session | null>(null);
   private expiryTimer: ReturnType<typeof setTimeout> | undefined;
+  readonly userId = computed(() =>
+    jwtSubject(this.session()?.accessToken ?? null),
+  );
   readonly isAuthenticated = computed(() => this.session() !== null);
 
   constructor() {

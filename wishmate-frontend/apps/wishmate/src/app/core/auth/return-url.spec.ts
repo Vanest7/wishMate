@@ -4,6 +4,8 @@ import { safeReturnUrl } from './return-url';
 describe('safeReturnUrl', () => {
   it.each([
     '/groups',
+    '/groups/12',
+    '/groups/12/members',
     '/reservations',
     '/groups/12/events',
     '/groups/12/events/34/wishes?view=mine#list',

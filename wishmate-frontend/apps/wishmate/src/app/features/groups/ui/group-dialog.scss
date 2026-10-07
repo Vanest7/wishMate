@@ -1,0 +1,38 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+mat-form-field {
+  width: 100%;
+  margin-top: 12px;
+}
+p,
+h2 {
+  overflow-wrap: anywhere;
+}
+.group-name {
+  color: var(--mat-sys-primary);
+  font-weight: 700;
+}
+.error {
+  color: var(--mat-sys-error);
+}
+.danger {
+  --mdc-filled-button-container-color: var(--mat-sys-error);
+  --mat-button-filled-container-color: var(--mat-sys-error);
+}
+mat-dialog-actions {
+  gap: 8px;
+  padding: 16px 24px 24px;
+}
+@media (max-width: 480px) {
+  mat-dialog-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  mat-dialog-actions button {
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
+  }
+}

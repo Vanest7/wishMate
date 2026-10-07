@@ -1,0 +1,104 @@
+<a mat-button routerLink="/groups">← {{ content.back }}</a> @if (success()) {
+<p class="success" role="status">{{ success() }}</p>
+} @if (loading()) {
+<div class="state" role="status">
+  <p>{{ content.loadingDetail }}</p>
+  <mat-progress-bar mode="indeterminate" />
+</div>
+} @else if (error()) {
+<div class="state">
+  <p role="alert">{{ error() }}</p>
+  <button mat-stroked-button type="button" (click)="retry()">
+    {{ content.retry }}
+  </button>
+</div>
+} @else if (group(); as current) {
+<section aria-labelledby="group-title">
+  <div class="detail-hero">
+    <p class="eyebrow">{{ content.eyebrow }}</p>
+    <h1 id="group-title">{{ current.name }}</h1>
+    <p class="description">{{ content.detailDescription }}</p>
+    @if (permissions().role; as role) {
+    <span class="role">{{ content.roles[role] }}</span> }
+    <div class="actions flex flex-wrap gap-3">
+      @if (permissions().canRename) {
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="edit('rename')"
+        [disabled]="dialogOpen()"
+      >
+        {{ content.rename }}
+      </button>
+      } @if (permissions().canDelete) {
+      <button
+        mat-button
+        class="delete-action"
+        type="button"
+        (click)="edit('delete')"
+        [disabled]="dialogOpen()"
+      >
+        {{ content.delete }}
+      </button>
+      }
+    </div>
+  </div>
+  <nav
+    class="section-navigation flex flex-wrap gap-3"
+    [attr.aria-label]="content.navigation"
+  >
+    <a
+      mat-button
+      [routerLink]="['/groups', current.id]"
+      [attr.aria-current]="!membersOnly() ? 'page' : null"
+      >{{ content.overview }}</a
+    >
+    <a
+      mat-button
+      [routerLink]="['/groups', current.id, 'members']"
+      [attr.aria-current]="membersOnly() ? 'page' : null"
+      >{{ content.members }}</a
+    >
+    <a mat-button [routerLink]="['/groups', current.id, 'events']"
+      >{{ content.events }}</a
+    >
+  </nav>
+  @if (membersOnly()) {
+  <h2>{{ content.members }}</h2>
+  <p class="description">{{ content.membersDescription }}</p>
+  <ul class="member-list">
+    @for (member of members(); track member.userId) {
+    <li>
+      <span class="member-name"
+        >{{ member.userName || content.unknownMember }}</span
+      ><span class="role"
+        >{{ member.role ? content.roles[member.role] : content.unknownRole
+        }}</span
+      >
+    </li>
+    } @empty {
+    <li>{{ content.noMembers }}</li>
+    }
+  </ul>
+  } @else {
+  <div class="group-grid">
+    <article class="group-card">
+      <h2>
+        {{ content.members }} <span class="count">{{ members().length }}</span>
+      </h2>
+      <p>{{ content.membersDescription }}</p>
+      <a mat-stroked-button [routerLink]="['/groups', current.id, 'members']"
+        >{{ content.membersLink }}</a
+      >
+    </article>
+    <article class="group-card">
+      <h2>{{ content.events }}</h2>
+      <p>{{ content.eventsDescription }}</p>
+      <a mat-stroked-button [routerLink]="['/groups', current.id, 'events']"
+        >{{ content.events }}</a
+      >
+    </article>
+  </div>
+  }
+</section>
+}

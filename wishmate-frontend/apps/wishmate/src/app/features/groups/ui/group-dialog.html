@@ -1,0 +1,79 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<form
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+  [attr.aria-busy]="pending()"
+>
+  <mat-dialog-content>
+    @if (data.mode === 'delete') {
+      <p>{{ content.deleteDescription }}</p>
+      <p class="group-name">{{ data.group.name }}</p>
+    } @else {
+      <p>
+        {{
+          data.mode === 'create'
+            ? content.createDescription
+            : content.renameDescription
+        }}
+      </p>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ content.name }}</mat-label>
+
+        <input
+          matInput
+          formControlName="name"
+          maxlength="100"
+          autocomplete="off"
+        />
+
+        <mat-hint>{{ content.nameHint }}</mat-hint>
+
+        @if (name.hasError('required')) {
+          <mat-error>{{ content.required }}</mat-error>
+        } @else if (name.hasError('maxlength')) {
+          <mat-error>{{ content.maxLength }}</mat-error>
+        } @else if (name.hasError('server')) {
+          <mat-error>{{ content.serverName }}</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+
+    @if (pending()) {
+      <p role="status">
+        {{ data.mode === 'delete' ? content.deleting : content.pending }}
+      </p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      type="button"
+      (click)="cancel()"
+      [disabled]="pending()"
+    >
+      {{ content.cancel }}
+    </button>
+
+    <button
+      mat-flat-button
+      type="submit"
+      [class.danger]="data.mode === 'delete'"
+      [disabled]="pending()"
+    >
+      {{
+        data.mode === 'delete'
+          ? content.delete
+          : data.mode === 'create'
+            ? content.create
+            : content.save
+      }}
+    </button>
+  </mat-dialog-actions>
+</form>
