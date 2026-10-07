@@ -49,7 +49,7 @@ describe('Authentication forms', () => {
     expect(page.errorMessage()).toContain('no son correctos');
   });
 
-  it('returns to the private deep link on successful login', () => {
+  it('navigates to the dashboard after login even when a return URL is provided', () => {
     const fixture = TestBed.createComponent(LoginPage);
     fixture.componentRef.setInput('returnUrl', '/groups/12/events/34/wishes');
     const navigate = vi
@@ -62,7 +62,7 @@ describe('Authentication forms', () => {
     fixture.componentInstance.submit();
     result.next();
     result.complete();
-    expect(navigate).toHaveBeenCalledWith('/groups/12/events/34/wishes', {
+    expect(navigate).toHaveBeenCalledWith('/dashboard', {
       replaceUrl: true,
     });
     expect(fixture.componentInstance.form.controls.password.value).toBe('');
