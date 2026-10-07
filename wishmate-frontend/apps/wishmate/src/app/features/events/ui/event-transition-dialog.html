@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>{{ titles[data.mode] }}</h2>
+<mat-dialog-content [attr.aria-busy]="pending()">
+  <p>{{ descriptions[data.mode] }}</p>
+  <p class="event-name">{{ data.event.name }}</p>
+  @if (error()) {
+  <p class="error" role="alert">{{ error() }}</p>
+  } @if (pending()) {
+  <p role="status">{{ content.pending }}</p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()" [disabled]="pending()">
+    {{ content.cancel }}
+  </button>
+  <button
+    mat-flat-button
+    type="button"
+    (click)="submit()"
+    [disabled]="pending()"
+  >
+    {{ labels[data.mode] }}
+  </button>
+</mat-dialog-actions>

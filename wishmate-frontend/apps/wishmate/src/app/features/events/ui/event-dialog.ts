@@ -30,7 +30,6 @@ import {
 import { finalize, map, Observable } from 'rxjs';
 import {
   canEventAction,
-  EventAction,
   eventError,
   ValidEvent,
   validDateOnly,
@@ -38,9 +37,8 @@ import {
 } from '../event-utils';
 import { eventsContent } from '../events.content';
 
-export type EventDialogData =
-  | { mode: 'create'; groupId: number }
-  | { mode: EventAction; groupId: number; event: ValidEvent };
+import { EventFormDialogData } from '../models/event-dialog.model';
+export type { EventDialogData } from '../models/event-dialog.model';
 
 @Component({
   selector: 'app-event-dialog',
@@ -57,7 +55,7 @@ export type EventDialogData =
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventDialog {
-  readonly data = inject<EventDialogData>(MAT_DIALOG_DATA);
+  readonly data = inject<EventFormDialogData>(MAT_DIALOG_DATA);
   private readonly ref =
     inject<MatDialogRef<EventDialog, ValidEvent>>(MatDialogRef);
   private readonly api = inject(EventsService);
@@ -65,7 +63,6 @@ export class EventDialog {
   readonly content = eventsContent;
   readonly pending = signal(false);
   readonly error = signal('');
-  readonly isForm = this.data.mode === 'create' || this.data.mode === 'edit';
   private readonly initial =
     this.data.mode === 'create' ? undefined : this.data.event;
   readonly form = new FormGroup(
@@ -133,23 +130,14 @@ export class EventDialog {
   readonly titles = {
     create: this.content.createTitle,
     edit: this.content.editTitle,
-    activate: this.content.activateTitle,
-    close: this.content.closeTitle,
-    archive: this.content.archiveTitle,
   };
   readonly descriptions = {
     create: this.content.createDescription,
     edit: this.content.editDescription,
-    activate: this.content.activateDescription,
-    close: this.content.closeDescription,
-    archive: this.content.archiveDescription,
   };
   readonly labels = {
     create: this.content.create,
     edit: this.content.save,
-    activate: this.content.activate,
-    close: this.content.close,
-    archive: this.content.archive,
   };
 
   cancel(): void {
@@ -158,7 +146,7 @@ export class EventDialog {
 
   submit(): void {
     if (this.pending()) return;
-    if (this.isForm && this.form.invalid) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
@@ -243,15 +231,6 @@ export class EventDialog {
         body: { ...body, status: raw.status },
       });
     const params = { groupId: data.groupId, eventId: data.event.id };
-    switch (data.mode) {
-      case 'edit':
-        return this.api.updateEvent({ ...params, body });
-      case 'activate':
-        return this.api.activateEvent(params);
-      case 'close':
-        return this.api.closeEvent(params);
-      case 'archive':
-        return this.api.archiveEvent(params);
-    }
+    return this.api.updateEvent({ ...params, body });
   }
 }

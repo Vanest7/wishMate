@@ -72,6 +72,12 @@ class AuthControllerTest {
     @MockitoBean
     private JwtDecoder jwtDecoder;
 
+    // The .with(csrf()) post-processor used in other tests in this class
+    // seeds the session with an HttpSessionCsrfTokenRepository token (header name:
+    // X-CSRF-TOKEN), which would override the CookieCsrfTokenRepository token
+    // (header name: X-XSRF-TOKEN) that the endpoint must return.  Recreating the
+    // context before this test ensures a clean session with only the Cookie-based
+    // repository active.
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void shouldProvideCsrfTokenWithoutAuthentication() throws Exception {

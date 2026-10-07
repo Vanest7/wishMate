@@ -28,24 +28,19 @@ import {
   canManageWish,
   parsePrice,
   safePurchaseUrl,
-  ValidWish,
   validWish,
-  WishEvent,
   wishError,
 } from '../wish-utils';
 import { wishesContent } from '../wishes.content';
 
-export type WishDialogData =
-  | { mode: 'create'; groupId: number; event: WishEvent }
-  | {
-      mode: 'edit' | 'delete';
-      groupId: number;
-      event: WishEvent;
-      wish: ValidWish;
-    };
-export type WishDialogResult =
-  | { mode: 'create' | 'edit'; wish: ValidWish }
-  | { mode: 'delete'; wishId: number };
+import {
+  WishFormDialogData,
+  WishDialogResult,
+} from '../models/wish-dialog.model';
+export type {
+  WishDialogData,
+  WishDialogResult,
+} from '../models/wish-dialog.model';
 
 @Component({
   selector: 'app-wish-dialog',
@@ -61,7 +56,7 @@ export type WishDialogResult =
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WishDialog {
-  readonly data = inject<WishDialogData>(MAT_DIALOG_DATA);
+  readonly data = inject<WishFormDialogData>(MAT_DIALOG_DATA);
   private readonly api = inject(WishesService);
   private readonly session = inject(SessionService);
   private readonly ref =
@@ -123,9 +118,7 @@ export class WishDialog {
   readonly title =
     this.data.mode === 'create'
       ? this.content.createTitle
-      : this.data.mode === 'edit'
-        ? this.content.editTitle
-        : this.content.deleteTitle;
+      : this.content.editTitle;
 
   cancel(): void {
     if (!this.pending()) this.ref.close();
@@ -144,7 +137,7 @@ export class WishDialog {
       this.error.set(this.content.errors.forbidden);
       return;
     }
-    if (data.mode !== 'delete' && this.form.invalid) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
@@ -157,30 +150,21 @@ export class WishDialog {
       estimatedPrice: price ?? undefined,
     };
     const params = { groupId: data.groupId, eventId: data.event.id };
-    const request: Observable<WishDialogResult> =
-      data.mode === 'delete'
-        ? this.api.deleteWish({ ...params, wishId: data.wish.id }).pipe(
-            map(
-              (): WishDialogResult => ({
-                mode: 'delete',
-                wishId: data.wish.id,
-              }),
-            ),
-          )
-        : (data.mode === 'create'
-            ? this.api.createWish({ ...params, body })
-            : this.api.updateWish({ ...params, wishId: data.wish.id, body })
-          ).pipe(
-            map((wish): WishDialogResult => {
-              if (
-                !validWish(wish, data.event.id) ||
-                wish.userId !== userId ||
-                (data.mode === 'edit' && wish.id !== data.wish.id)
-              )
-                throw new Error('Invalid wish response');
-              return { mode: data.mode === 'create' ? 'create' : 'edit', wish };
-            }),
-          );
+    const request: Observable<WishDialogResult> = (
+      data.mode === 'create'
+        ? this.api.createWish({ ...params, body })
+        : this.api.updateWish({ ...params, wishId: data.wish.id, body })
+    ).pipe(
+      map((wish): WishDialogResult => {
+        if (
+          !validWish(wish, data.event.id) ||
+          wish.userId !== userId ||
+          (data.mode === 'edit' && wish.id !== data.wish.id)
+        )
+          throw new Error('Invalid wish response');
+        return { mode: data.mode === 'create' ? 'create' : 'edit', wish };
+      }),
+    );
     this.pending.set(true);
     this.error.set('');
     this.form.disable();

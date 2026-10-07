@@ -44,56 +44,17 @@
     >Ver deseos de mis grupos</a
   >
 </div>
-} @else { @if (cancelling()) {
-<p role="status">Cancelando tu reserva…</p>
-}
+} @else {
 <ul class="reservation-grid">
   @for (card of cards(); track card.reservation.id) {
-  <li class="reservation-card">
-    @if (card.target; as target) {
-    <p class="context">{{ target.group.name }} · {{ target.event.name }}</p>
-    <h2>{{ target.wish.name }}</h2>
-    <p class="description">{{ target.wish.description }}</p>
-    <p>
-      Evento: {{ target.event.status ? statusLabels[target.event.status] :
-      'Estado no disponible' }}
-    </p>
-    @if (card.date) {
-    <p>Reservado el {{ card.date }}</p>
-    }
-    <div class="actions">
-      <a
-        mat-button
-        [routerLink]="['/groups', target.group.id, 'events', target.event.id, 'wishes']"
-        >Ver deseos del evento</a
-      >
-      @if (canCancel(card)) {
-      <button
-        mat-stroked-button
-        type="button"
-        [disabled]="busy()"
-        (click)="cancel(card)"
-        [attr.aria-label]="'Cancelar reserva: ' + target.wish.name"
-      >
-        Cancelar reserva
-      </button>
-      }
-    </div>
-    @if (!canCancel(card)) {
-    <p>La cancelación solo está disponible en eventos activos.</p>
-    } } @else {
-    <h2>Detalles de la reserva no disponibles</h2>
-    <p>
-      No hemos podido consultar este deseo. Puede que ya no tengas acceso al
-      grupo o que haya fallado la carga. La reserva no se ha cancelado.
-    </p>
-    @if (card.date) {
-    <p>Reservado el {{ card.date }}</p>
-    }
-    <button mat-button type="button" (click)="retry()" [disabled]="busy()">
-      Volver a consultar
-    </button>
-    }
+  <li>
+    <app-reservation-card
+      [model]="card"
+      [canCancel]="canCancel(card)"
+      [disabled]="busy()"
+      (cancelRequested)="cancel(card)"
+      (retryRequested)="retry()"
+    />
   </li>
   }
 </ul>

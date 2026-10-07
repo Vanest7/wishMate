@@ -1,10 +1,7 @@
 package com.gifts.demo.controller;
 
 import com.gifts.demo.common.exception.*;
-import com.gifts.demo.controller.exception.ApiExceptionHandler;
 import com.gifts.demo.domain.model.*;
-import com.gifts.demo.security.SecurityConfig;
-import com.gifts.demo.security.currentUser.SpringSecurityCurrentUserProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -28,11 +25,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.gifts.demo.controller.mapper.EventWebMapperImpl;
+import com.gifts.demo.controller.support.ControllerTest;
 import com.gifts.demo.domain.usecase.event.*;
 
 @WebMvcTest(EventController.class)
-@Import({SecurityConfig.class, ApiExceptionHandler.class,
-        SpringSecurityCurrentUserProvider.class, EventWebMapperImpl.class})
+@ControllerTest
+@Import(EventWebMapperImpl.class)
 class EventControllerTest {
     @Autowired
     private MockMvc mockMvc;

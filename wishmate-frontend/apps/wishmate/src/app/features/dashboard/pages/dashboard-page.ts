@@ -1,4 +1,10 @@
 import {
+  DashboardDataService,
+  DashboardEvent,
+  DashboardGroup,
+} from '../data-access/dashboard-data.service';
+import { eventStatusLabels } from '../../../shared/domain/event-status';
+import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -12,15 +18,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import {
-  EventsService,
-  EventResponse,
-  GroupsService,
-  GroupResponse,
-} from '@wishmate/api-client';
-import {
   catchError,
   EMPTY,
-  map,
   of,
   startWith,
   Subject,
@@ -30,11 +29,9 @@ import {
 } from 'rxjs';
 import { NavigationCard } from '../../../shared/ui/navigation-card/navigation-card';
 
-type DashboardGroup = GroupResponse & { id: number; name: string };
-type DashboardEvent = EventResponse & { id: number; name: string };
-
 @Component({
   selector: 'app-dashboard-page',
+  providers: [DashboardDataService],
   imports: [
     NavigationCard,
     RouterLink,
@@ -48,8 +45,7 @@ type DashboardEvent = EventResponse & { id: number; name: string };
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardPage {
-  private readonly groupsApi = inject(GroupsService);
-  private readonly eventsApi = inject(EventsService);
+  private readonly data = inject(DashboardDataService);
   private readonly route = inject(ActivatedRoute);
   private readonly groupReload = new Subject<void>();
   private readonly eventReload = new Subject<void>();
@@ -102,18 +98,13 @@ export class DashboardPage {
       iconColor: '#047857',
       iconBackground: '#d1fae5',
       description:
-        'Tu espacio de regalos reservados. Listado pendiente de implementación.',
+        'Consulta los regalos que has reservado y gestiona sus reservas.',
       destination: '/reservations',
       action: 'Ir a reservas',
       query: null,
     },
   ];
-  readonly statusLabels = {
-    DRAFT: 'Borrador',
-    ACTIVE: 'Activo',
-    CLOSED: 'Cerrado',
-    ARCHIVED: 'Archivado',
-  };
+  readonly statusLabels = eventStatusLabels;
 
   constructor() {
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
@@ -131,18 +122,8 @@ export class DashboardPage {
           this.groupId.set(null);
         }),
         switchMap(() =>
-          this.groupsApi.getMyGroups().pipe(
+          this.data.getGroups().pipe(
             tap((groups) => {
-              if (
-                !groups.every(
-                  (group): group is DashboardGroup =>
-                    Number.isSafeInteger(group.id) &&
-                    (group.id ?? 0) > 0 &&
-                    typeof group.name === 'string' &&
-                    !!group.name.trim(),
-                )
-              )
-                throw new Error('Invalid groups response');
               this.groups.set(groups);
               if (groups.length === 1) this.groupId.set(groups[0].id);
               this.groupsLoading.set(false);
@@ -170,21 +151,7 @@ export class DashboardPage {
         switchMap(([groupId]) =>
           groupId === null
             ? of([])
-            : this.eventsApi.getEvents({ groupId }).pipe(
-                map((events) => {
-                  if (
-                    !events.every(
-                      (event): event is DashboardEvent =>
-                        Number.isSafeInteger(event.id) &&
-                        (event.id ?? 0) > 0 &&
-                        event.groupId === groupId &&
-                        typeof event.name === 'string' &&
-                        !!event.name.trim(),
-                    )
-                  )
-                    throw new Error('Invalid events response');
-                  return events;
-                }),
+            : this.data.getEvents(groupId).pipe(
                 catchError(() => {
                   this.eventsError.set(true);
                   return of([]);

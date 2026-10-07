@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   inject,
   Signal,
@@ -21,7 +22,12 @@ import { finalize } from 'rxjs';
 import { SessionService } from '../../../core/auth/session.service';
 import { GroupSectionContext } from './group-section-context';
 import { groupsContent } from '../groups.content';
-import { canRemoveMember, groupError } from '../group-utils';
+import {
+  canRemoveMember,
+  canRemoveMemberWithRole,
+  groupPermissions,
+  groupError,
+} from '../group-utils';
 
 @Component({
   selector: 'app-group-members-page',
@@ -33,6 +39,15 @@ import { canRemoveMember, groupError } from '../group-utils';
 export class GroupMembersPage {
   readonly context = inject<Signal<GroupSectionContext>>(ROUTER_OUTLET_DATA);
   readonly content = groupsContent;
+  readonly memberCards = computed(() => {
+    const { group, members } = this.context();
+    const userId = this.session.userId();
+    const role = groupPermissions(members, userId).role;
+    return members.map((member) => ({
+      member,
+      canRemove: canRemoveMemberWithRole(group, role, userId, member),
+    }));
+  });
   readonly selectedMember = signal<GroupMemberResponse | null>(null);
   readonly pending = signal(false);
   readonly error = signal('');

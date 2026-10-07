@@ -5,7 +5,8 @@ import { EventsService, EventResponse } from '@wishmate/api-client';
 import { Subject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ValidEvent } from '../event-utils';
-import { EventDialog, EventDialogData } from './event-dialog';
+import { EventDialog } from './event-dialog';
+import { EventFormDialogData as EventDialogData } from '../models/event-dialog.model';
 
 const current: ValidEvent = {
   id: 4,
@@ -119,41 +120,15 @@ describe('Event dialog', () => {
     });
     expect(current.description).toBe('Party');
   });
-  it.each([
-    ['activate', 'DRAFT', 'activateEvent'],
-    ['close', 'ACTIVE', 'closeEvent'],
-    ['archive', 'CLOSED', 'archiveEvent'],
-  ] as const)(
-    'confirms %s using its dedicated endpoint',
-    (mode, status, method) => {
-      const page = setup({
-        mode,
-        groupId: 1,
-        event: { ...current, status },
-      }).componentInstance;
-      expect(api[method]).not.toHaveBeenCalled();
-      page.submit();
-      page.submit();
-      expect(api[method]).toHaveBeenCalledExactlyOnceWith({
-        groupId: 1,
-        eventId: 4,
-      });
-      expect(api.updateEvent).not.toHaveBeenCalled();
-    },
-  );
-  it.each(['edit', 'activate', 'close', 'archive'] as const)(
-    'blocks %s for archived events',
-    (mode) => {
-      const page = setup({
-        mode,
-        groupId: 1,
-        event: { ...current, status: 'ARCHIVED' },
-      }).componentInstance;
-      page.submit();
-      for (const request of Object.values(api))
-        expect(request).not.toHaveBeenCalled();
-    },
-  );
+  it('blocks editing archived events', () => {
+    const page = setup({
+      mode: 'edit',
+      groupId: 1,
+      event: { ...current, status: 'ARCHIVED' },
+    }).componentInstance;
+    page.submit();
+    expect(api.updateEvent).not.toHaveBeenCalled();
+  });
   it.each([0, 400, 403, 404, 409, 500])(
     'keeps the dialog open and restores input after status %s',
     (status) => {

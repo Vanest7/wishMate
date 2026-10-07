@@ -1,3 +1,4 @@
+import { ReservationCard as ReservationCardComponent } from '../ui/reservation-card';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -33,7 +34,12 @@ import { CancelReservationDialog } from '../ui/cancel-reservation-dialog';
 
 @Component({
   selector: 'app-reservation-list-page',
-  imports: [RouterLink, MatButtonModule, MatProgressBarModule],
+  imports: [
+    RouterLink,
+    MatButtonModule,
+    MatProgressBarModule,
+    ReservationCardComponent,
+  ],
   providers: [ReservationsDataService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './reservation-list-page.html',
@@ -54,12 +60,6 @@ export class ReservationListPage {
   readonly success = signal('');
   readonly busy = signal(false);
   readonly cancelling = signal(false);
-  readonly statusLabels = {
-    DRAFT: 'Borrador',
-    ACTIVE: 'Activo',
-    CLOSED: 'Cerrado',
-    ARCHIVED: 'Archivado',
-  };
 
   constructor() {
     this.destroyRef.onDestroy(() => this.dialogRef?.close());

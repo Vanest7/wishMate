@@ -2,7 +2,6 @@
 <form [formGroup]="form" (ngSubmit)="submit()" [attr.aria-busy]="pending()">
   <mat-dialog-content>
     <p>{{ descriptions[data.mode] }}</p>
-    @if (isForm) {
     <mat-form-field appearance="outline">
       <mat-label>{{ content.name }}</mat-label>
       <input
@@ -80,8 +79,6 @@
       <mat-error>{{ content.serverField }}</mat-error>
     </mat-form-field>
     <p class="hint">{{ content.statusHint }}</p>
-    } } @else if (data.mode !== 'create') {
-    <p class="event-name">{{ data.event.name }}</p>
     } @if (error()) {
     <p class="error" role="alert">{{ error() }}</p>
     } @if (pending()) {

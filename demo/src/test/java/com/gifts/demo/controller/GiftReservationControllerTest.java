@@ -3,7 +3,6 @@ package com.gifts.demo.controller;
 import com.gifts.demo.common.exception.ForbiddenOperationException;
 import com.gifts.demo.common.exception.ResourceAlreadyExistsException;
 import com.gifts.demo.common.exception.ResourceNotFoundException;
-import com.gifts.demo.controller.exception.ApiExceptionHandler;
 import com.gifts.demo.domain.model.GiftReservation;
 import com.gifts.demo.domain.model.User;
 import com.gifts.demo.domain.model.Wish;
@@ -11,12 +10,9 @@ import com.gifts.demo.domain.usecase.reservation.CancelGiftReservationUseCase;
 import com.gifts.demo.domain.usecase.reservation.CreateGiftReservationUseCase;
 import com.gifts.demo.domain.usecase.reservation.GetGiftReservationUseCase;
 import com.gifts.demo.domain.usecase.reservation.GetMyGiftReservationsUseCase;
-import com.gifts.demo.security.SecurityConfig;
-import com.gifts.demo.security.currentUser.SpringSecurityCurrentUserProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -30,13 +26,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.gifts.demo.controller.support.ControllerTest;
 
 @WebMvcTest(GiftReservationController.class)
-@Import({
-        SecurityConfig.class,
-        SpringSecurityCurrentUserProvider.class,
-        ApiExceptionHandler.class
-})
+@ControllerTest
 class GiftReservationControllerTest {
 
     private static final String BASE_URL = "/api/reservations";

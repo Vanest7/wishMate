@@ -2,7 +2,6 @@ package com.gifts.demo.controller;
 
 import com.gifts.demo.common.exception.ForbiddenOperationException;
 import com.gifts.demo.common.exception.ResourceNotFoundException;
-import com.gifts.demo.controller.exception.ApiExceptionHandler;
 import com.gifts.demo.domain.model.Event;
 import com.gifts.demo.domain.model.User;
 import com.gifts.demo.domain.model.Wish;
@@ -12,12 +11,9 @@ import com.gifts.demo.domain.usecase.wish.GetWishUseCase;
 import com.gifts.demo.domain.usecase.wish.GetWishesByEventUseCase;
 import com.gifts.demo.domain.usecase.wish.GetWishesByUserUseCase;
 import com.gifts.demo.domain.usecase.wish.UpdateWishUseCase;
-import com.gifts.demo.security.SecurityConfig;
-import com.gifts.demo.security.currentUser.SpringSecurityCurrentUserProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -33,12 +29,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.gifts.demo.controller.support.ControllerTest;
+
 @WebMvcTest(WishController.class)
-@Import({
-        SecurityConfig.class,
-        SpringSecurityCurrentUserProvider.class,
-        ApiExceptionHandler.class
-})
+@ControllerTest
 class WishControllerTest {
 
     private static final String BASE_URL =

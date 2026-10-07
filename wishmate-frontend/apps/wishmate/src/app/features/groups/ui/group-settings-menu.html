@@ -1,0 +1,47 @@
+@if (permissions().canRename || permissions().canDelete) {
+<button
+  mat-icon-button
+  class="settings-trigger"
+  type="button"
+  [attr.aria-label]="content.settings"
+  [matMenuTriggerFor]="settingsMenu"
+  #settingsTrigger="matMenuTrigger"
+  [disabled]="disabled()"
+  (mouseenter)="openSettings(settingsTrigger)"
+  (mouseleave)="scheduleSettingsClose(settingsTrigger)"
+>
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path
+      d="M9.5 3h5l.6 2.4 1.5.9L19 5.6l2.5 4.3-1.8 1.7v1.8l1.8 1.7-2.5 4.3-2.4-.7-1.5.9-.6 2.4h-5l-.6-2.4-1.5-.9-2.4.7L2.5 15.1l1.8-1.7v-1.8L2.5 9.9 5 5.6l2.4.7 1.5-.9L9.5 3Z"
+    />
+    <circle cx="12" cy="12.5" r="3" />
+  </svg>
+</button>
+<mat-menu #settingsMenu="matMenu" [hasBackdrop]="false">
+  <div
+    (mouseenter)="cancelSettingsClose()"
+    (mouseleave)="scheduleSettingsClose(settingsTrigger)"
+  >
+    @if (permissions().canRename) {
+    <button
+      mat-menu-item
+      type="button"
+      (click)="renameRequested.emit()"
+      [disabled]="disabled()"
+    >
+      {{ content.rename }}
+    </button>
+    } @if (permissions().canDelete) {
+    <button
+      mat-menu-item
+      class="delete-action"
+      type="button"
+      (click)="deleteRequested.emit()"
+      [disabled]="disabled()"
+    >
+      {{ content.delete }}
+    </button>
+    }
+  </div>
+</mat-menu>
+}

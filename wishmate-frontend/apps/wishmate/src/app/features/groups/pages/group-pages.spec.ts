@@ -150,7 +150,7 @@ describe('Group pages', () => {
     expect(
       TestBed.inject(OverlayContainer).getContainerElement().textContent,
     ).toContain('Cambiar nombre');
-    fixture.componentInstance.cancelSettingsClose();
+    fixture.destroy();
   });
   it('guards member additions and refreshes only after success', () => {
     const closed = new Subject<boolean | undefined>();

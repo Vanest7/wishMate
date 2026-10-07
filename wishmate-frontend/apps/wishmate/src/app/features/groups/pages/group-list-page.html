@@ -7,14 +7,14 @@
     </div>
 
     @if (!loading() && !error() && groups().length > 0) {
-      <button
-        mat-flat-button
-        type="button"
-        (click)="create()"
-        [disabled]="dialogOpen()"
-      >
-        {{ content.create }}
-      </button>
+    <button
+      mat-flat-button
+      type="button"
+      (click)="create()"
+      [disabled]="dialogOpen()"
+    >
+      {{ content.create }}
+    </button>
     }
   </div>
   @if (success()) {

@@ -124,11 +124,7 @@ button:focus-visible {
 
 .navigation a:hover,
 .navigation button:hover {
-  background: color-mix(
-    in srgb,
-    var(--mat-sys-secondary) 12%,
-    transparent
-  );
+  background: color-mix(in srgb, var(--mat-sys-secondary) 12%, transparent);
 }
 
 .navigation a.is-active {

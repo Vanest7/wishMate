@@ -1,3 +1,7 @@
+import { DeleteWishDialog } from '../ui/delete-wish-dialog';
+import { WishCard } from '../ui/wish-card';
+import { WishCardModel } from '../models/wish-card.model';
+import { WishesDataService } from '../data-access/wishes-data.service';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,16 +16,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import {
-  EventsService,
-  GroupMembersService,
-  GroupsService,
-  WishesService,
-} from '@wishmate/api-client';
-import {
   catchError,
   combineLatest,
   EMPTY,
-  forkJoin,
   startWith,
   Subject,
   switchMap,
@@ -35,7 +32,6 @@ import {
   safePurchaseUrl,
   ValidWish,
   validWish,
-  validWishEvent,
   wishError,
   WishPageData,
 } from '../wish-utils';
@@ -48,22 +44,23 @@ import {
 
 @Component({
   selector: 'app-wish-list-page',
-  imports: [MatButtonModule, RouterLink, MatProgressBarModule],
+  providers: [WishesDataService],
+  imports: [MatButtonModule, RouterLink, MatProgressBarModule, WishCard],
   templateUrl: './wish-list-page.html',
   styleUrl: './wish-list-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WishListPage {
-  private readonly api = inject(WishesService);
-  private readonly groupsApi = inject(GroupsService);
-  private readonly eventsApi = inject(EventsService);
-  private readonly membersApi = inject(GroupMembersService);
+  private readonly wishesData = inject(WishesDataService);
   private readonly route = inject(ActivatedRoute);
   private readonly session = inject(SessionService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   private readonly reload = new Subject<void>();
-  private dialogRef?: MatDialogRef<WishDialog, WishDialogResult>;
+  private dialogRef?: MatDialogRef<
+    WishDialog | DeleteWishDialog,
+    WishDialogResult
+  >;
   readonly content = wishesContent;
   readonly data = signal<WishPageData | null>(null);
   readonly loading = signal(true);
@@ -76,24 +73,28 @@ export class WishListPage {
       this.data()?.event.status === 'ACTIVE' &&
       positiveId(this.session.userId()),
   );
-  readonly cards = computed(() => {
+  private readonly allCards = computed<WishCardModel[]>(() => {
     const data = this.data();
     const userId = this.session.userId();
     if (!data) return [];
     const names = new Map(
       data.members.map((member) => [member.userId, member.userName]),
     );
-    return data.wishes
-      .filter((wish) => !this.mineOnly() || wish.userId === userId)
-      .map((wish) => ({
-        wish,
-        ownerName: names.get(wish.userId) || this.content.unknownOwner,
-        isMine: wish.userId === userId,
-        canManage: canManageWish(wish, data.event, userId),
-        purchaseHref: safePurchaseUrl(wish.purchaseUrl),
-        price: formatPrice(wish.estimatedPrice),
-      }));
+    return data.wishes.map((wish) => ({
+      wish,
+      ownerName: names.get(wish.userId) || this.content.unknownOwner,
+      isMine: wish.userId === userId,
+      canManage: canManageWish(wish, data.event, userId),
+      purchaseHref: safePurchaseUrl(wish.purchaseUrl),
+      price: formatPrice(wish.estimatedPrice),
+    }));
   });
+
+  readonly cards = computed(() =>
+    this.mineOnly()
+      ? this.allCards().filter((card) => card.isMine)
+      : this.allCards(),
+  );
 
   constructor() {
     this.destroyRef.onDestroy(() => this.dialogRef?.close());
@@ -130,31 +131,9 @@ export class WishListPage {
             this.error.set(this.content.errors.missing);
             return EMPTY;
           }
-          return forkJoin({
-            group: this.groupsApi.getGroup({ groupId }),
-            event: this.eventsApi.getEvent({ groupId, eventId }),
-            wishes: this.api.getWishesByEvent({ groupId, eventId }),
-            members: this.membersApi.getMembers({ groupId }),
-          }).pipe(
-            tap(({ group, event, wishes, members }) => {
-              if (
-                !group ||
-                group.id !== groupId ||
-                typeof group.name !== 'string' ||
-                !group.name.trim() ||
-                !validWishEvent(event, groupId, eventId) ||
-                !wishes.every((wish): wish is ValidWish =>
-                  validWish(wish, eventId),
-                ) ||
-                new Set(wishes.map((wish) => wish.id)).size !== wishes.length
-              )
-                throw new Error('Invalid wish page response');
-              this.data.set({
-                group: { ...group, id: groupId, name: group.name },
-                event,
-                wishes,
-                members,
-              });
+          return this.wishesData.getPage(groupId, eventId).pipe(
+            tap((data) => {
+              this.data.set(data);
               this.loading.set(false);
             }),
             catchError((error: unknown) => {
@@ -201,15 +180,16 @@ export class WishListPage {
     const userId = this.session.userId();
     this.dialogOpen.set(true);
     this.success.set('');
-    const ref = this.dialog.open<WishDialog, WishDialogData, WishDialogResult>(
-      WishDialog,
-      {
-        data,
-        width: '620px',
-        maxWidth: 'calc(100vw - 32px)',
-        autoFocus: data.mode === 'delete' ? 'button' : 'first-tabbable',
-      },
-    );
+    const ref = this.dialog.open<
+      WishDialog | DeleteWishDialog,
+      WishDialogData,
+      WishDialogResult
+    >(data.mode === 'delete' ? DeleteWishDialog : WishDialog, {
+      data,
+      width: '620px',
+      maxWidth: 'calc(100vw - 32px)',
+      autoFocus: data.mode === 'delete' ? 'button' : 'first-tabbable',
+    });
     this.dialogRef = ref;
     ref
       .afterClosed()

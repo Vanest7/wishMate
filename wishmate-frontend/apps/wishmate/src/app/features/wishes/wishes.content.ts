@@ -1,3 +1,4 @@
+import { eventStatusLabels } from '../../shared/domain/event-status';
 export const wishesContent = {
   title: 'Lista de deseos',
   description:
@@ -52,12 +53,7 @@ export const wishesContent = {
   invalidPrice:
     'Introduce un importe entre 0 y 99999999,99 con un máximo de dos decimales.',
   serverField: 'Revisa este campo.',
-  states: {
-    DRAFT: 'Borrador',
-    ACTIVE: 'Activo',
-    CLOSED: 'Cerrado',
-    ARCHIVED: 'Archivado',
-  },
+  states: eventStatusLabels,
   readOnly: {
     DRAFT: 'Podrás añadir y modificar tus deseos cuando el evento esté activo.',
     ACTIVE: '',

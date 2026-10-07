@@ -1,0 +1,28 @@
+:host {
+  display: inline-block;
+  flex-shrink: 0;
+}
+.settings-trigger {
+  flex-shrink: 0;
+}
+.settings-trigger svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linejoin: round;
+  transition: transform 180ms ease;
+}
+.delete-action {
+  color: var(--mat-sys-tertiary);
+}
+.settings-trigger:hover svg,
+.settings-trigger:focus-visible svg {
+  transform: scale(1.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  .settings-trigger svg {
+    transition: none;
+  }
+}
