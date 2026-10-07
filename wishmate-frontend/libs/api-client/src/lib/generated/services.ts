@@ -7,3 +7,4 @@ export { GiftReservationsService } from './services/gift-reservations.service';
 export { GroupsService } from './services/groups.service';
 export { GroupMembersService } from './services/group-members.service';
 export { AuthenticationService } from './services/authentication.service';
+export { UsersService } from './services/users.service';

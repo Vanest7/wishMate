@@ -1,0 +1,23 @@
+<div class="group-grid">
+  <article class="group-card">
+    <h2>
+      {{ content.members }}
+      <span class="count">{{ context().members.length }}</span>
+    </h2>
+    <p>{{ content.membersDescription }}</p>
+    <a
+      mat-stroked-button
+      [routerLink]="['/groups', context().group.id, 'members']"
+      >{{ content.membersLink }}</a
+    >
+  </article>
+  <article class="group-card">
+    <h2>{{ content.events }}</h2>
+    <p>{{ content.eventsDescription }}</p>
+    <a
+      mat-stroked-button
+      [routerLink]="['/groups', context().group.id, 'events']"
+      >{{ content.events }}</a
+    >
+  </article>
+</div>

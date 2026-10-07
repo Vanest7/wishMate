@@ -51,6 +51,15 @@ export class RegisterPage {
   readonly form = this.builder.group(
     {
       userName: ['', [nonBlank]],
+      handle: [
+        '',
+        [
+          nonBlank,
+          Validators.minLength(3),
+          Validators.maxLength(30),
+          Validators.pattern(/^[A-Za-z0-9._]+$/),
+        ],
+      ],
       email: ['', [nonBlank, Validators.email]],
       password: [
         '',
@@ -71,6 +80,9 @@ export class RegisterPage {
     this.form.controls.userName.setValue(
       this.form.controls.userName.value.trim(),
     );
+    this.form.controls.handle.setValue(
+      this.form.controls.handle.value.trim().toLowerCase(),
+    );
     for (const control of Object.values(this.form.controls))
       control.updateValueAndValidity();
     this.form.updateValueAndValidity();
@@ -85,6 +97,7 @@ export class RegisterPage {
     this.auth
       .register({
         userName: value.userName,
+        handle: value.handle,
         email: value.email,
         password: value.password,
       })

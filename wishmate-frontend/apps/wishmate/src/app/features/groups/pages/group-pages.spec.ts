@@ -5,6 +5,7 @@ import {
   convertToParamMap,
   provideRouter,
 } from '@angular/router';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { MatDialog } from '@angular/material/dialog';
 import {
   GroupsService,
@@ -15,6 +16,7 @@ import {
 import { BehaviorSubject, of, Subject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SessionService } from '../../../core/auth/session.service';
+import { groupsContent } from '../groups.content';
 import { GroupListPage } from './group-list-page';
 import { GroupDetailPage } from './group-detail-page';
 
@@ -56,7 +58,7 @@ describe('Group pages', () => {
     list.next([]);
     list.complete();
     await fixture.whenStable();
-    expect(text()).toContain('Todo empieza con tu gente');
+    expect(text()).toContain(groupsContent.emptyTitle);
     list = new Subject();
     fixture.componentInstance.retry();
     list.error(new HttpErrorResponse({ status: 500 }));
@@ -111,11 +113,71 @@ describe('Group pages', () => {
       members.next([{ userId: 7, role }]);
       members.complete();
       await fixture.whenStable();
-      const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-      expect(text.includes('Cambiar nombre')).toBe(role !== 'MEMBER');
-      expect(text.includes('Eliminar grupo')).toBe(role === 'OWNER');
+      const element = fixture.nativeElement as HTMLElement;
+      expect(element.textContent?.includes('Añadir miembros')).toBe(
+        role !== 'MEMBER',
+      );
+      const trigger =
+        element.querySelector<HTMLButtonElement>('.settings-trigger');
+      expect(!!trigger).toBe(role !== 'MEMBER');
+      if (trigger) {
+        trigger.click();
+        await fixture.whenStable();
+        const menu = TestBed.inject(OverlayContainer).getContainerElement();
+        expect(menu.textContent).toContain('Cambiar nombre');
+        expect(menu.textContent?.includes('Eliminar grupo')).toBe(
+          role === 'OWNER',
+        );
+      }
     },
   );
+  it('opens settings on hover', async () => {
+    TestBed.inject(SessionService).start(
+      `a.${btoa(JSON.stringify({ sub: '7' }))}.c`,
+      3600,
+    );
+    const fixture = TestBed.createComponent(GroupDetailPage);
+    details.next({ id: 1, name: 'Familia' });
+    details.complete();
+    members.next([{ userId: 7, role: 'OWNER' }]);
+    members.complete();
+    await fixture.whenStable();
+    const trigger = (fixture.nativeElement as HTMLElement).querySelector(
+      '.settings-trigger',
+    );
+    trigger?.dispatchEvent(new MouseEvent('mouseenter'));
+    await fixture.whenStable();
+    expect(
+      TestBed.inject(OverlayContainer).getContainerElement().textContent,
+    ).toContain('Cambiar nombre');
+    fixture.componentInstance.cancelSettingsClose();
+  });
+  it('guards member additions and refreshes only after success', () => {
+    const closed = new Subject<boolean | undefined>();
+    vi.spyOn(TestBed.inject(MatDialog), 'open').mockReturnValue({
+      afterClosed: () => closed,
+      close: vi.fn(),
+    } as never);
+    const page = TestBed.createComponent(GroupDetailPage).componentInstance;
+    page.addMember();
+    expect(TestBed.inject(MatDialog).open).not.toHaveBeenCalled();
+    TestBed.inject(SessionService).start(
+      `a.${btoa(JSON.stringify({ sub: '7' }))}.c`,
+      3600,
+    );
+    details.next({ id: 1, name: 'Familia' });
+    details.complete();
+    members.next([{ userId: 7, role: 'ADMIN' }]);
+    members.complete();
+    page.addMember();
+    page.addMember();
+    expect(TestBed.inject(MatDialog).open).toHaveBeenCalledTimes(1);
+    expect(api.getGroup).toHaveBeenCalledTimes(1);
+    closed.next(true);
+    closed.complete();
+    expect(api.getGroup).toHaveBeenCalledTimes(2);
+    expect(page.success()).toBe('Miembro añadido.');
+  });
   it('clears previous data and cancels stale reads on group changes', () => {
     const page = TestBed.createComponent(GroupDetailPage).componentInstance;
     const oldDetails = details;

@@ -11,6 +11,7 @@ describe('Group permissions', () => {
     (role, canRename, canDelete) => {
       expect(groupPermissions([{ userId: 7, role }], 7)).toEqual({
         role,
+        canAddMembers: canRename,
         canRename,
         canDelete,
       });

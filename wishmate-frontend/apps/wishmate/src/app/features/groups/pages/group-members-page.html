@@ -1,0 +1,68 @@
+<h2>{{ content.members }}</h2>
+<p class="description">{{ content.membersDescription }}</p>
+@if (success()) {
+<p class="success" role="status">{{ success() }}</p>
+}
+<ul class="member-list">
+  @for (member of context().members; track member.userId) {
+  <li>
+    <span class="member-name"
+      >{{ member.userName || content.unknownMember }}</span
+    >
+    <div class="member-actions">
+      <span class="role"
+        >{{ member.role ? content.roles[member.role] : content.unknownRole
+        }}</span
+      >
+      @if (canRemove(member)) {
+      <button
+        mat-icon-button
+        type="button"
+        class="remove-member"
+        [attr.aria-label]="content.removeMember + ': ' + (member.userName || content.unknownMember)"
+        [title]="content.removeMember"
+        [disabled]="selectedMember() !== null"
+        (click)="openRemove(member, removeConfirmation)"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
+        </svg>
+      </button>
+      }
+    </div>
+  </li>
+  } @empty {
+  <li>{{ content.noMembers }}</li>
+  }
+</ul>
+<ng-template #removeConfirmation>
+  <h2 mat-dialog-title>{{ content.removeMemberTitle }}</h2>
+  <mat-dialog-content [attr.aria-busy]="pending()">
+    <p>
+      <strong>{{ selectedMember()?.userName || content.unknownMember }}</strong>
+    </p>
+    <p>{{ content.removeMemberDescription }}</p>
+    @if (error()) {
+    <p class="member-error" role="alert">{{ error() }}</p>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      type="button"
+      (click)="cancelRemove()"
+      [disabled]="pending()"
+    >
+      {{ content.cancel }}
+    </button>
+    <button
+      mat-flat-button
+      class="confirm-remove-member"
+      type="button"
+      (click)="confirmRemove()"
+      [disabled]="pending()"
+    >
+      {{ pending() ? content.removingMember : content.removeMember }}
+    </button>
+  </mat-dialog-actions>
+</ng-template>

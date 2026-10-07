@@ -38,6 +38,27 @@
   </mat-form-field>
 
   <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>{{ content.fields.handle }}</mat-label>
+    <input
+      matInput
+      type="text"
+      formControlName="handle"
+      autocomplete="username"
+      required
+    />
+
+    @if (form.controls.handle.hasError('required')) {
+    <mat-error>{{ content.errors.required }}</mat-error>
+    } @else if (form.controls.handle.hasError('minlength') ||
+    form.controls.handle.hasError('maxlength') ||
+    form.controls.handle.hasError('pattern')) {
+    <mat-error>{{ content.errors.handle }}</mat-error>
+    } @else if (form.controls.handle.hasError('server')) {
+    <mat-error>{{ content.errors.invalidField }}</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
     <mat-label>{{ content.fields.email }}</mat-label>
     <input
       matInput

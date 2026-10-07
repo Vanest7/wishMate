@@ -61,3 +61,5 @@ export type { Login$Params as Login$Params } from './fn/authentication/login';
 export { login as login } from './fn/authentication/login';
 export type { GetCsrfToken$Params as GetCsrfToken$Params } from './fn/authentication/get-csrf-token';
 export { getCsrfToken as getCsrfToken } from './fn/authentication/get-csrf-token';
+export type { Search$Params as Search$Params } from './fn/users/search';
+export { search as search } from './fn/users/search';

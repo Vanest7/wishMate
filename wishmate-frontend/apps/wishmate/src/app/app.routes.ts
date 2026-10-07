@@ -34,13 +34,6 @@ export const appRoutes: Routes = [
           import('./features/wishes/wishes.routes').then((m) => m.wishesRoutes),
       },
       {
-        path: 'groups/:groupId/events',
-        canActivate: [resourceIdGuard],
-        runGuardsAndResolvers: 'paramsChange',
-        loadChildren: () =>
-          import('./features/events/events.routes').then((m) => m.eventsRoutes),
-      },
-      {
         path: 'groups',
         loadChildren: () =>
           import('./features/groups/groups.routes').then((m) => m.groupsRoutes),

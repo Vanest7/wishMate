@@ -20,6 +20,7 @@ export const authContent = {
   },
   fields: {
     userName: 'Nombre de usuario',
+    handle: 'NickName',
     email: 'Correo electrónico',
     password: 'Contraseña',
     confirmPassword: 'Repite la contraseña',
@@ -31,6 +32,7 @@ export const authContent = {
   errors: {
     required: 'Completa este campo.',
     email: 'Introduce un correo electrónico válido.',
+    handle: 'Usa entre 3 y 30 letras, números, puntos o guiones bajos.',
     passwordRequirements:
       'La contraseña debe tener al menos 6 caracteres, una mayúscula y un número.',
     mismatch: 'Las contraseñas no coinciden.',

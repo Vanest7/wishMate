@@ -70,10 +70,7 @@ h2 {
 
 .group-grid {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(min(100%, 280px), 1fr)
-  );
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 24px;
   margin: 0;
   padding: 0;
@@ -151,6 +148,23 @@ h2 {
   border-radius: 12px;
   background: var(--mat-sys-secondary-container);
   color: var(--mat-sys-on-secondary-container);
+  animation: success-dismiss 10s ease forwards;
+}
+
+@keyframes success-dismiss {
+  0%,
+  94% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .success {
+    animation: none;
+  }
 }
 
 .detail-hero {
@@ -243,4 +257,63 @@ h2 {
   .section-navigation {
     gap: 4px;
   }
+}
+
+.group-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.group-title-row h1 {
+  min-width: 0;
+  margin-bottom: 0;
+}
+.settings-trigger {
+  flex-shrink: 0;
+}
+.settings-trigger svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linejoin: round;
+  transition: transform 180ms ease;
+}
+.settings-trigger:hover svg,
+.settings-trigger:focus-visible svg {
+  transform: scale(1.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  .settings-trigger svg {
+    transition: none;
+  }
+}
+
+.group-section {
+  min-height: 100dvh;
+}
+
+.member-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.remove-member,
+.member-error {
+  color: var(--mat-sys-error);
+}
+.remove-member svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.confirm-remove-member {
+  --mat-button-filled-container-color: var(--mat-sys-error);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-error);
 }

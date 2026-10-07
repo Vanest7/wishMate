@@ -46,8 +46,10 @@ export class GroupListPage {
   readonly error = signal('');
   readonly success = signal('');
   readonly dialogOpen = signal(false);
+  private successTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor() {
+    this.destroyRef.onDestroy(() => clearTimeout(this.successTimer));
     this.reload
       .pipe(
         startWith(undefined),
@@ -100,9 +102,15 @@ export class GroupListPage {
         unregister();
         this.dialogOpen.set(false);
         if (result?.mode === 'create') {
-          this.success.set(this.content.created);
+          this.showSuccess(this.content.created);
           this.reload.next();
         }
       });
+  }
+
+  private showSuccess(message: string): void {
+    clearTimeout(this.successTimer);
+    this.success.set(message);
+    this.successTimer = setTimeout(() => this.success.set(''), 10000);
   }
 }

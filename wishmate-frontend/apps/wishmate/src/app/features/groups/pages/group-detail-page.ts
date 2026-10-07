@@ -7,7 +7,15 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { AddMemberDialog, AddMemberDialogData } from '../ui/add-member-dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
@@ -39,7 +47,14 @@ import {
 
 @Component({
   selector: 'app-group-detail-page',
-  imports: [RouterLink, MatButtonModule, MatProgressBarModule],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    MatButtonModule,
+    MatProgressBarModule,
+    MatMenuModule,
+  ],
   templateUrl: './group-detail-page.html',
   styleUrl: './groups-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,21 +72,74 @@ export class GroupDetailPage {
   readonly content = groupsContent;
   readonly group = signal<(GroupResponse & { id: number }) | null>(null);
   readonly members = signal<GroupMemberResponse[]>([]);
-  readonly membersOnly = signal(false);
   readonly loading = signal(true);
   readonly error = signal('');
   readonly success = signal('');
   readonly dialogOpen = signal(false);
+  private successTimer: ReturnType<typeof setTimeout> | undefined;
   readonly permissions = computed(() =>
     groupPermissions(this.members(), this.session.userId()),
   );
 
+  readonly memberRemoved = (groupId: number, userId: number): void => {
+    if (this.group()?.id !== groupId) return;
+    this.members.update((members) =>
+      members.filter((member) => member.userId !== userId),
+    );
+  };
+
+  private settingsCloseTimer: ReturnType<typeof setTimeout> | undefined;
+
+  openSettings(trigger: MatMenuTrigger): void {
+    this.cancelSettingsClose();
+    if (this.dialogOpen() || trigger.menuOpen) return;
+
+    trigger.openMenu();
+    trigger.menu?.focusFirstItem('mouse');
+  }
+
+  cancelSettingsClose(): void {
+    clearTimeout(this.settingsCloseTimer);
+    this.settingsCloseTimer = undefined;
+  }
+
+  scheduleSettingsClose(trigger: MatMenuTrigger): void {
+    this.cancelSettingsClose();
+    this.settingsCloseTimer = setTimeout(() => trigger.closeMenu(), 250);
+  }
+
+  addMember(): void {
+    const group = this.group();
+    if (!group || this.dialogOpen() || !this.permissions().canAddMembers)
+      return;
+    this.dialogOpen.set(true);
+    const dialogRef = this.dialog.open<
+      AddMemberDialog,
+      AddMemberDialogData,
+      boolean
+    >(AddMemberDialog, {
+      data: { groupId: group.id },
+      width: '520px',
+      maxWidth: 'calc(100vw - 32px)',
+    });
+    const unregister = this.destroyRef.onDestroy(() => dialogRef.close());
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((added) => {
+        unregister();
+        this.dialogOpen.set(false);
+        if (added && this.group()?.id === group.id) {
+          this.showSuccess(this.content.memberAdded);
+          this.reload.next();
+        }
+      });
+  }
+
   constructor() {
-    combineLatest([
-      this.route.paramMap,
-      this.route.data,
-      this.reload.pipe(startWith(undefined)),
-    ])
+    this.destroyRef.onDestroy(() => this.cancelSettingsClose());
+    this.destroyRef.onDestroy(() => clearTimeout(this.successTimer));
+    combineLatest([this.route.paramMap, this.reload.pipe(startWith(undefined))])
       .pipe(
         tap(() => {
           this.group.set(null);
@@ -79,9 +147,8 @@ export class GroupDetailPage {
           this.loading.set(true);
           this.error.set('');
         }),
-        switchMap(([params, data]) => {
+        switchMap(([params]) => {
           const groupId = Number(params.get('groupId'));
-          this.membersOnly.set(data['membersOnly'] === true);
           return forkJoin({
             group: this.api.getGroup({ groupId }),
             members: this.membersApi.getMembers({ groupId }),
@@ -141,9 +208,15 @@ export class GroupDetailPage {
           });
           void this.router.navigate(['/groups']);
         } else if (result?.mode === 'rename') {
-          this.success.set(this.content.renamed);
+          this.showSuccess(this.content.renamed);
           this.reload.next();
         }
       });
+  }
+
+  private showSuccess(message: string): void {
+    clearTimeout(this.successTimer);
+    this.success.set(message);
+    this.successTimer = setTimeout(() => this.success.set(''), 10000);
   }
 }

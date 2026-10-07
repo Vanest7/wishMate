@@ -3,6 +3,11 @@
 
 export interface RegisterRequest {
   email: string;
+
+  /**
+   * Public unique identifier. After normalization, it contains 3 to 30 ASCII letters, numbers, dots or underscores. Outer spaces and uppercase letters are normalized.
+   */
+  handle: string;
   password: string;
   userName: string;
 }

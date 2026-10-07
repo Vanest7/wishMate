@@ -16,6 +16,7 @@ export type { LoginRequest } from './models/login-request';
 export type { LoginResponse } from './models/login-response';
 export type { RegisterRequest } from './models/register-request';
 export type { RenameGroupRequest } from './models/rename-group-request';
+export type { SearchUserResponse } from './models/search-user-response';
 export type { UpdateEventRequest } from './models/update-event-request';
 export type { UpdateWishRequest } from './models/update-wish-request';
 export type { UserResponse } from './models/user-response';

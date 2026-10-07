@@ -3,6 +3,11 @@
 
 export interface UserResponse {
   email?: string;
+
+  /**
+   * Public unique identifier; null for historical accounts not backfilled yet.
+   */
+  handle?: string;
   id?: number;
   userName?: string;
 }

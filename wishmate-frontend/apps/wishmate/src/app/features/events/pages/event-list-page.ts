@@ -1,6 +1,12 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  Signal,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { RouterLink } from '@angular/router';
+import { ROUTER_OUTLET_DATA, RouterLink } from '@angular/router';
+import { GroupSectionContext } from '../../groups/pages/group-section-context';
 
 @Component({
   selector: 'app-event-list-page',
@@ -8,7 +14,7 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <h1 class="mb-4 text-2xl font-bold">Eventos</h1>
-    <p class="mb-4">Grupo {{ groupId() }}</p>
+    <p class="mb-4">Grupo {{ context().group.name }}</p>
     <a mat-button routerLink="/groups">Volver a grupos</a>
     <p>
       Aquí podrás consultar los eventos del grupo. El listado está pendiente de
@@ -17,5 +23,5 @@ import { RouterLink } from '@angular/router';
   `,
 })
 export class EventListPage {
-  readonly groupId = input.required<string>();
+  readonly context = inject<Signal<GroupSectionContext>>(ROUTER_OUTLET_DATA);
 }

@@ -72,6 +72,7 @@ describe('Authentication forms', () => {
     const page = TestBed.createComponent(RegisterPage).componentInstance;
     page.form.setValue({
       userName: ' ',
+      handle: 'ana',
       email: 'test@example.com',
       password: 'Secret1',
       confirmPassword: 'Other1',
@@ -102,6 +103,7 @@ describe('Authentication forms', () => {
     const page = TestBed.createComponent(RegisterPage).componentInstance;
     page.form.setValue({
       userName: ' Test ',
+      handle: ' Ana.Garcia ',
       email: 'test@example.com',
       password: ' Secret1 ',
       confirmPassword: ' Secret1 ',
@@ -110,6 +112,7 @@ describe('Authentication forms', () => {
     page.submit();
     expect(auth.register).toHaveBeenCalledExactlyOnceWith({
       userName: 'Test',
+      handle: 'ana.garcia',
       email: 'test@example.com',
       password: ' Secret1 ',
     });
@@ -124,6 +127,7 @@ describe('Authentication forms', () => {
     const page = TestBed.createComponent(RegisterPage).componentInstance;
     page.form.setValue({
       userName: 'Test',
+      handle: 'test',
       email: 'test@example.com',
       password: 'Secret1',
       confirmPassword: 'Secret1',

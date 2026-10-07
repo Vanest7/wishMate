@@ -16,32 +16,70 @@
 <section aria-labelledby="group-title">
   <div class="detail-hero">
     <p class="eyebrow">{{ content.eyebrow }}</p>
-    <h1 id="group-title">{{ current.name }}</h1>
-    <p class="description">{{ content.detailDescription }}</p>
-    @if (permissions().role; as role) {
-    <span class="role">{{ content.roles[role] }}</span> }
-    <div class="actions flex flex-wrap gap-3">
-      @if (permissions().canRename) {
+    <div class="group-title-row">
+      <h1 id="group-title">{{ current.name }}</h1>
+      @if (permissions().canRename || permissions().canDelete) {
       <button
-        mat-stroked-button
+        mat-icon-button
+        class="settings-trigger"
         type="button"
-        (click)="edit('rename')"
+        [attr.aria-label]="content.settings"
+        [matMenuTriggerFor]="settingsMenu"
+        #settingsTrigger="matMenuTrigger"
         [disabled]="dialogOpen()"
+        (mouseenter)="openSettings(settingsTrigger)"
+        (mouseleave)="scheduleSettingsClose(settingsTrigger)"
       >
-        {{ content.rename }}
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path
+            d="M9.5 3h5l.6 2.4 1.5.9L19 5.6l2.5 4.3-1.8 1.7v1.8l1.8 1.7-2.5 4.3-2.4-.7-1.5.9-.6 2.4h-5l-.6-2.4-1.5-.9-2.4.7L2.5 15.1l1.8-1.7v-1.8L2.5 9.9 5 5.6l2.4.7 1.5-.9L9.5 3Z"
+          />
+          <circle cx="12" cy="12.5" r="3" />
+        </svg>
       </button>
-      } @if (permissions().canDelete) {
-      <button
-        mat-button
-        class="delete-action"
-        type="button"
-        (click)="edit('delete')"
-        [disabled]="dialogOpen()"
-      >
-        {{ content.delete }}
-      </button>
+      <mat-menu #settingsMenu="matMenu" [hasBackdrop]="false">
+        <div
+          (mouseenter)="cancelSettingsClose()"
+          (mouseleave)="scheduleSettingsClose(settingsTrigger)"
+        >
+          @if (permissions().canRename) {
+          <button
+            mat-menu-item
+            type="button"
+            (click)="edit('rename')"
+            [disabled]="dialogOpen()"
+          >
+            {{ content.rename }}
+          </button>
+          } @if (permissions().canDelete) {
+          <button
+            mat-menu-item
+            class="delete-action"
+            type="button"
+            (click)="edit('delete')"
+            [disabled]="dialogOpen()"
+          >
+            {{ content.delete }}
+          </button>
+          }
+        </div>
+      </mat-menu>
       }
     </div>
+    @if (permissions().role; as role) {
+    <span class="role">{{ content.roles[role] }}</span>
+    } @if (permissions().canAddMembers) {
+    <div class="actions flex flex-wrap gap-3">
+      <button
+        mat-flat-button
+        type="button"
+        (click)="addMember()"
+        [disabled]="dialogOpen()"
+      >
+        {{ content.addMembers }}
+      </button>
+    </div>
+    }
   </div>
   <nav
     class="section-navigation flex flex-wrap gap-3"
@@ -50,55 +88,30 @@
     <a
       mat-button
       [routerLink]="['/groups', current.id]"
-      [attr.aria-current]="!membersOnly() ? 'page' : null"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      [routerLinkActiveOptions]="{ exact: true }"
       >{{ content.overview }}</a
     >
     <a
       mat-button
       [routerLink]="['/groups', current.id, 'members']"
-      [attr.aria-current]="membersOnly() ? 'page' : null"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
       >{{ content.members }}</a
     >
-    <a mat-button [routerLink]="['/groups', current.id, 'events']"
+    <a
+      mat-button
+      [routerLink]="['/groups', current.id, 'events']"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
       >{{ content.events }}</a
     >
   </nav>
-  @if (membersOnly()) {
-  <h2>{{ content.members }}</h2>
-  <p class="description">{{ content.membersDescription }}</p>
-  <ul class="member-list">
-    @for (member of members(); track member.userId) {
-    <li>
-      <span class="member-name"
-        >{{ member.userName || content.unknownMember }}</span
-      ><span class="role"
-        >{{ member.role ? content.roles[member.role] : content.unknownRole
-        }}</span
-      >
-    </li>
-    } @empty {
-    <li>{{ content.noMembers }}</li>
-    }
-  </ul>
-  } @else {
-  <div class="group-grid">
-    <article class="group-card">
-      <h2>
-        {{ content.members }} <span class="count">{{ members().length }}</span>
-      </h2>
-      <p>{{ content.membersDescription }}</p>
-      <a mat-stroked-button [routerLink]="['/groups', current.id, 'members']"
-        >{{ content.membersLink }}</a
-      >
-    </article>
-    <article class="group-card">
-      <h2>{{ content.events }}</h2>
-      <p>{{ content.eventsDescription }}</p>
-      <a mat-stroked-button [routerLink]="['/groups', current.id, 'events']"
-        >{{ content.events }}</a
-      >
-    </article>
+  <div class="group-section">
+    <router-outlet
+      [routerOutletData]="{ group: current, members: members(), memberRemoved: memberRemoved }"
+    />
   </div>
-  }
 </section>
 }
