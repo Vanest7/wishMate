@@ -3,6 +3,9 @@ import { safeReturnUrl } from './return-url';
 
 describe('safeReturnUrl', () => {
   it.each([
+    '/dashboard',
+    '/dashboard?section=wishes',
+    '/groups/12/events/34',
     '/groups',
     '/groups/12',
     '/groups/12/members',
@@ -23,6 +26,6 @@ describe('safeReturnUrl', () => {
     '/groups\\evil',
     '/unknown',
   ])('replaces the invalid destination %s', (url) =>
-    expect(safeReturnUrl(url)).toBe('/groups'),
+    expect(safeReturnUrl(url)).toBe('/dashboard'),
   );
 });

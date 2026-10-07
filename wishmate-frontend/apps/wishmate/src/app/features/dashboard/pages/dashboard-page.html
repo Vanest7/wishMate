@@ -1,0 +1,80 @@
+<header>
+  <p class="eyebrow">TU ESPACIO WISHMATE</p>
+  <h1>¿Qué quieres hacer hoy?</h1>
+  <p>Grupos, celebraciones y regalos, a un vistazo.</p>
+</header>
+<nav class="card-grid" aria-label="Accesos principales">
+  @for (card of cards; track card.title) {
+    <app-navigation-card
+      [title]="card.title"
+      [description]="card.description"
+      [icon]="card.icon"
+      [destination]="card.destination"
+      [queryParams]="card.query"
+      [actionLabel]="card.action"
+      [style.--card-icon-color]="card.iconColor"
+      [style.--card-icon-background]="card.iconBackground"
+    />
+  }
+</nav>
+<section class="quick-access" aria-labelledby="quick-title">
+  <h2 id="quick-title">
+    {{ section() === 'events' ? 'Acceso rápido a eventos' : 'Acceso rápido a deseos' }}
+  </h2>
+  <p>Elige tu grupo y entra directamente al evento que buscas.</p>
+  @if (groupsLoading()) {
+  <p role="status">Cargando tus grupos…</p>
+  <mat-progress-bar mode="indeterminate" />
+  } @else if (groupsError()) {
+  <p role="alert">No hemos podido cargar tus grupos.</p>
+  <button mat-button (click)="retryGroups()">Volver a intentar</button>
+  } @else if (groups().length === 0) {
+  <p>Aún no perteneces a ningún grupo. Crea uno para empezar.</p>
+  <a mat-flat-button routerLink="/groups">Ir a grupos</a>
+  } @else {
+  <mat-form-field appearance="outline">
+    <mat-label>Grupo</mat-label>
+    <mat-select
+      [value]="groupId()"
+      (selectionChange)="selectGroup($event.value)"
+    >
+      @for (item of groups(); track item.id) {
+      <mat-option [value]="item.id">{{ item.name }}</mat-option> }
+    </mat-select>
+  </mat-form-field>
+  @if (group(); as current) { @if (eventsLoading()) {
+  <p role="status">Cargando eventos…</p>
+  <mat-progress-bar mode="indeterminate" />
+  } @else if (eventsError()) {
+  <p role="alert">No hemos podido cargar los eventos de este grupo.</p>
+  <button mat-button (click)="retryEvents()">Volver a intentar</button>
+  } @else if (events().length === 0) {
+  <p>Este grupo todavía no tiene eventos.</p>
+  } @else {
+  <ul>
+    @for (event of events(); track event.id) {
+    <li>
+      <div>
+        <strong>{{ event.name }}</strong
+        ><span
+          >{{ current.name }} · {{ event.status ? statusLabels[event.status] :
+          'Estado no disponible' }}</span
+        >
+      </div>
+      <a
+        mat-stroked-button
+        [routerLink]="section() === 'events' ? ['/groups', current.id, 'events', event.id] : ['/groups', current.id, 'events', event.id, 'wishes']"
+        >{{ section() === 'events' ? 'Ver evento' : event.status === 'ACTIVE' ?
+        'Ver y añadir deseos' : 'Consultar deseos' }}<span class="sr-only"
+          >: {{ event.name }}</span
+        ></a
+      >
+    </li>
+    }
+  </ul>
+  }
+  <a mat-button [routerLink]="['/groups', current.id, 'events']"
+    >Gestionar eventos de {{ current.name }}</a
+  >
+  } }
+</section>

@@ -28,7 +28,6 @@ export const wishesContent = {
   unknownOwner: 'Miembro del grupo',
   loading: 'Cargando deseos…',
   retry: 'Volver a intentar',
-  refresh: 'Actualizar',
   emptyTitle: 'Las buenas ideas empiezan con un deseo',
   emptyDescription: 'Todavía no hay deseos en este evento.',
   emptyMineTitle: 'Todavía no has añadido deseos',

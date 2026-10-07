@@ -68,11 +68,36 @@ describe('Authentication forms', () => {
     expect(fixture.componentInstance.form.controls.password.value).toBe('');
   });
 
+  it('shows no invalid fields after a successful native form submission while navigation is pending', async () => {
+    const fixture = TestBed.createComponent(LoginPage);
+    const navigate = vi
+      .spyOn(TestBed.inject(Router), 'navigateByUrl')
+      .mockImplementation(() => new Promise<boolean>(() => undefined));
+    await fixture.whenStable();
+    fixture.componentInstance.form.setValue({
+      email: 'test@example.com',
+      password: 'secret',
+    });
+    fixture.nativeElement
+      .querySelector('form')
+      .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    result.next();
+    result.complete();
+    await fixture.whenStable();
+    expect(navigate).toHaveBeenCalledWith('/dashboard', { replaceUrl: true });
+    expect(
+      fixture.nativeElement.querySelector('.mat-form-field-invalid'),
+    ).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Sesión iniciada');
+    expect(fixture.componentInstance.form.controls.password.value).toBe('');
+    fixture.componentInstance.submit();
+    expect(auth.login).toHaveBeenCalledTimes(1);
+  });
+
   it('blocks mismatching passwords and whitespace-only names', () => {
     const page = TestBed.createComponent(RegisterPage).componentInstance;
     page.form.setValue({
       userName: ' ',
-      handle: 'ana',
       email: 'test@example.com',
       password: 'Secret1',
       confirmPassword: 'Other1',
@@ -103,7 +128,6 @@ describe('Authentication forms', () => {
     const page = TestBed.createComponent(RegisterPage).componentInstance;
     page.form.setValue({
       userName: ' Test ',
-      handle: ' Ana.Garcia ',
       email: 'test@example.com',
       password: ' Secret1 ',
       confirmPassword: ' Secret1 ',
@@ -112,7 +136,6 @@ describe('Authentication forms', () => {
     page.submit();
     expect(auth.register).toHaveBeenCalledExactlyOnceWith({
       userName: 'Test',
-      handle: 'ana.garcia',
       email: 'test@example.com',
       password: ' Secret1 ',
     });
@@ -127,7 +150,6 @@ describe('Authentication forms', () => {
     const page = TestBed.createComponent(RegisterPage).componentInstance;
     page.form.setValue({
       userName: 'Test',
-      handle: 'test',
       email: 'test@example.com',
       password: 'Secret1',
       confirmPassword: 'Secret1',

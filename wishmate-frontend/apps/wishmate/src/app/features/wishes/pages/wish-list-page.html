@@ -62,9 +62,6 @@
       {{ content.mine }}
     </button>
   </div>
-  <button mat-button type="button" (click)="retry()" [disabled]="dialogOpen()">
-    {{ content.refresh }}
-  </button>
 </div>
 @if (success()) {
 <p class="success" role="status">{{ success() }}</p>

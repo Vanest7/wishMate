@@ -21,7 +21,7 @@ import { SessionService } from '../core/auth/session.service';
     <a class="skip-link" href="#main-content">Saltar al contenido</a>
     <header class="header">
       <div class="header-content">
-        <a routerLink="/groups" aria-label="Ir a mis grupos" class="brand">
+        <a routerLink="/dashboard" aria-label="Ir a mi panel" class="brand">
           <img
             src="/WishMate_ regalos compartidos con corazón.png"
             alt="WishMate"
@@ -30,6 +30,12 @@ import { SessionService } from '../core/auth/session.service';
         </a>
 
         <nav class="navigation" aria-label="Navegación principal">
+          <a
+            routerLink="/dashboard"
+            routerLinkActive="is-active"
+            ariaCurrentWhenActive="page"
+            >Mi panel</a
+          >
           <a
             routerLink="/groups"
             routerLinkActive="is-active"

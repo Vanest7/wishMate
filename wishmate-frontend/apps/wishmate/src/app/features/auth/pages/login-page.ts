@@ -6,9 +6,15 @@ import {
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroupDirective,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -37,6 +43,8 @@ export class LoginPage {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly builder = inject(FormBuilder).nonNullable;
+  private readonly formDirective = viewChild(FormGroupDirective);
+  readonly signedIn = signal(false);
   readonly content = authContent;
   readonly returnUrl = input<string | null>(null);
   readonly destination = computed(() => safeReturnUrl(this.returnUrl()));
@@ -50,7 +58,7 @@ export class LoginPage {
   });
 
   submit(): void {
-    if (this.pending()) return;
+    if (this.pending() || this.signedIn()) return;
     this.form.controls.email.setValue(this.form.controls.email.value.trim());
 
     for (const control of Object.values(this.form.controls))
@@ -78,8 +86,11 @@ export class LoginPage {
       )
       .subscribe({
         next: () => {
-          this.form.reset();
-          void this.router.navigateByUrl(this.destination(), {
+          this.signedIn.set(true);
+          const directive = this.formDirective();
+          if (directive) directive.resetForm();
+          else this.form.reset();
+          void this.router.navigateByUrl('/dashboard', {
             replaceUrl: true,
           });
         },

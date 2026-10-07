@@ -3,7 +3,7 @@ import { authGuard, authenticatedChildGuard } from './core/auth/auth.guard';
 import { resourceIdGuard } from './core/routing/resource-id.guard';
 
 export const appRoutes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'groups' },
+  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
     path: 'auth',
     loadComponent: () =>
@@ -26,6 +26,14 @@ export const appRoutes: Routes = [
         (m) => m.AuthenticatedLayout,
       ),
     children: [
+      {
+        path: 'dashboard',
+        title: 'Mi panel | WishMate',
+        loadComponent: () =>
+          import('./features/dashboard/pages/dashboard-page').then(
+            (m) => m.DashboardPage,
+          ),
+      },
       {
         path: 'groups/:groupId/events/:eventId/wishes',
         canActivate: [resourceIdGuard],
