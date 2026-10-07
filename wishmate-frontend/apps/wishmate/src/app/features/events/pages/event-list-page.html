@@ -1,0 +1,77 @@
+<header class="page-heading">
+  <div>
+    <p class="eyebrow">{{ content.group }} {{ context().group.name }}</p>
+    <h2>{{ content.title }}</h2>
+    <p class="description">{{ content.description }}</p>
+  </div>
+  @if (!loading() && !error()) {
+  <button
+    mat-flat-button
+    type="button"
+    (click)="create()"
+    [disabled]="dialogOpen()"
+  >
+    {{ content.create }}
+  </button>
+  }
+</header>
+@if (success()) {
+<p class="success" role="status">{{ success() }}</p>
+} @if (loading()) {
+<div class="state" role="status">
+  <p>{{ content.loading }}</p>
+  <mat-progress-bar mode="indeterminate" />
+</div>
+} @else if (error()) {
+<div class="state">
+  <p role="alert">{{ error() }}</p>
+  <button mat-stroked-button type="button" (click)="retry()">
+    {{ content.retry }}
+  </button>
+</div>
+} @else if (events().length === 0) {
+<div class="state empty">
+  <h3>{{ content.emptyTitle }}</h3>
+  <p>{{ content.emptyDescription }}</p>
+</div>
+} @else {
+<ul class="event-grid">
+  @for (event of events(); track event.id) {
+  <li class="event-card">
+    <span class="status" [attr.data-status]="event.status"
+      >{{ content.states[event.status] }}</span
+    >
+    <h3>{{ event.name }}</h3>
+    <p class="description card-description">
+      {{ event.description || content.noDescription }}
+    </p>
+    <div class="dates">
+      @if (event.startDate) {
+      <p>
+        {{ content.startDate }}:
+        <time [attr.datetime]="event.startDate"
+          >{{ formatDate(event.startDate) }}</time
+        >
+      </p>
+      } @if (event.endDate) {
+      <p>
+        {{ content.endDate }}:
+        <time [attr.datetime]="event.endDate"
+          >{{ formatDate(event.endDate) }}</time
+        >
+      </p>
+      } @if (!event.startDate && !event.endDate) {
+      <p>{{ content.noDates }}</p>
+      }
+    </div>
+    <a
+      mat-stroked-button
+      [routerLink]="['/groups', groupId(), 'events', event.id]"
+      >{{ content.open }}<span class="visually-hidden"
+        >: {{ event.name }}</span
+      ></a
+    >
+  </li>
+  }
+</ul>
+}

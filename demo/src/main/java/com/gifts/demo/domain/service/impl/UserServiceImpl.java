@@ -8,6 +8,7 @@ import com.gifts.demo.common.exception.ValidationException;
 import com.gifts.demo.domain.model.User;
 import com.gifts.demo.domain.repository.UserRepository;
 import com.gifts.demo.domain.service.UserService;
+import com.gifts.demo.domain.service.HandlePolicy;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
@@ -44,6 +45,12 @@ public class UserServiceImpl implements UserService {
     public User create(User user) {
         validateUser(user);
 
+        user.setHandle(HandlePolicy.normalize(user.getHandle()));
+        if (userRepository.existsByHandle(user.getHandle())) {
+            throw new ResourceAlreadyExistsException(
+                    "User with handle " + user.getHandle()
+            );
+        }
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new ResourceAlreadyExistsException(
                     "User with email " + user.getEmail()
@@ -67,6 +74,23 @@ public class UserServiceImpl implements UserService {
         }
 
         User currentUser = getById(user.getId());
+
+        if (user.getHandle() == null) {
+            user.setHandle(currentUser.getHandle());
+        } else {
+            user.setHandle(HandlePolicy.normalize(user.getHandle()));
+        }
+
+        boolean handleChanged =
+                currentUser.getHandle() == null
+                        ? user.getHandle() != null
+                        : !currentUser.getHandle().equals(user.getHandle());
+
+        if (handleChanged && userRepository.existsByHandle(user.getHandle())) {
+            throw new ResourceAlreadyExistsException(
+                    "User with handle " + user.getHandle()
+            );
+        }
 
         boolean emailChanged =
                 !currentUser.getEmail()

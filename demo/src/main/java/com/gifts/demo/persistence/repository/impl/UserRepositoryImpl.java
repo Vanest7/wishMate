@@ -6,6 +6,7 @@ import com.gifts.demo.persistence.dao.db.UserDaoDb;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -25,8 +26,18 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public List<User> search(String query) {
+        return userDaoDb.search(query);
+    }
+
+    @Override
     public boolean existsByEmail(String email) {
         return userDaoDb.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsByHandle(String handle) {
+        return userDaoDb.existsByHandle(handle);
     }
 
     @Override

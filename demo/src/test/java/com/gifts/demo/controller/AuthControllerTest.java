@@ -38,11 +38,13 @@ class AuthControllerTest {
     private static final String LOGIN_URL = "/api/auth/login";
 
     private static final String EMAIL = "user@example.test";
+    private static final String HANDLE = "test.user";
     private static final String PASSWORD = "Test-password-123!";
 
     private static final String REGISTER_BODY = """
             {
                 "userName": "Test user",
+                "handle": "test.user",
                 "email": "user@example.test",
                 "password": "Test-password-123!"
             }
@@ -96,11 +98,12 @@ class AuthControllerTest {
         User user = User.builder()
                 .id(20)
                 .userName("Test user")
+                .handle(HANDLE)
                 .email(EMAIL)
                 .passwordHash("test-password-hash")
                 .build();
 
-        when(registerUserUseCase.execute("Test user", EMAIL, PASSWORD))
+        when(registerUserUseCase.execute("Test user", HANDLE, EMAIL, PASSWORD))
                 .thenReturn(user);
 
         mockMvc.perform(post(REGISTER_URL)
@@ -110,12 +113,13 @@ class AuthControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(20))
                 .andExpect(jsonPath("$.userName").value("Test user"))
+                .andExpect(jsonPath("$.handle").value(HANDLE))
                 .andExpect(jsonPath("$.email").value(EMAIL))
                 .andExpect(jsonPath("$.password").doesNotExist())
                 .andExpect(jsonPath("$.passwordHash").doesNotExist());
 
         verify(registerUserUseCase)
-                .execute("Test user", EMAIL, PASSWORD);
+                .execute("Test user", HANDLE, EMAIL, PASSWORD);
     }
 
     @Test
@@ -126,6 +130,7 @@ class AuthControllerTest {
                         .content("""
                                 {
                                     "userName": "Test user",
+                                    "handle": "test.user",
                                     "email": "invalid-email",
                                     "password": "Test-password-123!"
                                 }
@@ -138,8 +143,26 @@ class AuthControllerTest {
     }
 
     @Test
+    void shouldRejectRegistrationWithoutHandle() throws Exception {
+        mockMvc.perform(post(REGISTER_URL)
+                        .servletPath(REGISTER_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "userName": "Test user",
+                                    "email": "user@example.test",
+                                    "password": "Test-password-123!"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors.handle").exists());
+
+        verifyNoInteractions(registerUserUseCase);
+    }
+
+    @Test
     void shouldReturnConflictForDuplicateRegistration() throws Exception {
-        when(registerUserUseCase.execute("Test user", EMAIL, PASSWORD))
+        when(registerUserUseCase.execute("Test user", HANDLE, EMAIL, PASSWORD))
                 .thenThrow(new ResourceAlreadyExistsException(
                         "A user with this email already exists"
                 ));

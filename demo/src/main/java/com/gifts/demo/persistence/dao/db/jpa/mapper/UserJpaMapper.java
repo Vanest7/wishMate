@@ -12,8 +12,10 @@ public interface UserJpaMapper {
     UserJpaMapper INSTANCE = Mappers.getMapper(UserJpaMapper.class);
 
     @Mapping(source = "mail", target = "email")
+    @Mapping(source = "handle", target = "handle")
     User toUser(UserEntity userEntity);
 
     @Mapping(source = "email", target = "mail")
+    @Mapping(source = "handle", target = "handle")
     UserEntity toUserEntity(User user);
 }

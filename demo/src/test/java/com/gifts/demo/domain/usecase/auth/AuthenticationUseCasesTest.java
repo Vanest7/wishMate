@@ -27,6 +27,7 @@ import static org.mockito.Mockito.*;
 class AuthenticationUseCasesTest {
 
     private static final String EMAIL = "user@example.test";
+    private static final String HANDLE = "test.user";
     private static final String PASSWORD = "Test-password-123!";
     private static final String HASH = "test-generated-hash";
 
@@ -61,6 +62,7 @@ class AuthenticationUseCasesTest {
 
         User result = register.execute(
                 "  Test user  ",
+                "  Test.User  ",
                 "  user@example.test  ",
                 PASSWORD
         );
@@ -76,6 +78,7 @@ class AuthenticationUseCasesTest {
 
         assertThat(submitted.getId()).isNull();
         assertThat(submitted.getUserName()).isEqualTo("Test user");
+        assertThat(submitted.getHandle()).isEqualTo(HANDLE);
         assertThat(submitted.getEmail()).isEqualTo(EMAIL);
         assertThat(submitted.getPasswordHash())
                 .isEqualTo(HASH)
@@ -90,7 +93,19 @@ class AuthenticationUseCasesTest {
         when(userRepository.existsByEmail(EMAIL)).thenReturn(true);
 
         assertThatThrownBy(() ->
-                register.execute("Test user", EMAIL, PASSWORD)
+                register.execute("Test user", HANDLE, EMAIL, PASSWORD)
+        ).isInstanceOf(ResourceAlreadyExistsException.class);
+
+        verifyNoInteractions(passwordService);
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void shouldRejectDuplicateHandleBeforeHashingPassword() {
+        when(userRepository.existsByHandle(HANDLE)).thenReturn(true);
+
+        assertThatThrownBy(() ->
+                register.execute("Test user", HANDLE, EMAIL, PASSWORD)
         ).isInstanceOf(ResourceAlreadyExistsException.class);
 
         verifyNoInteractions(passwordService);
@@ -102,7 +117,7 @@ class AuthenticationUseCasesTest {
     @ValueSource(strings = {" "})
     void shouldRejectRegistrationWithoutUserName(String userName) {
         assertThatThrownBy(() ->
-                register.execute(userName, EMAIL, PASSWORD)
+                register.execute(userName, HANDLE, EMAIL, PASSWORD)
         ).isInstanceOf(ValidationException.class);
 
         verifyNoInteractions(userRepository, passwordService);
@@ -113,7 +128,7 @@ class AuthenticationUseCasesTest {
     @ValueSource(strings = {" "})
     void shouldRejectRegistrationWithoutEmail(String email) {
         assertThatThrownBy(() ->
-                register.execute("Test user", email, PASSWORD)
+                register.execute("Test user", HANDLE, email, PASSWORD)
         ).isInstanceOf(ValidationException.class);
 
         verifyNoInteractions(userRepository, passwordService);
@@ -124,7 +139,7 @@ class AuthenticationUseCasesTest {
     @ValueSource(strings = {" "})
     void shouldRejectRegistrationWithoutPassword(String password) {
         assertThatThrownBy(() ->
-                register.execute("Test user", EMAIL, password)
+                register.execute("Test user", HANDLE, EMAIL, password)
         ).isInstanceOf(ValidationException.class);
 
         verifyNoInteractions(userRepository, passwordService);
@@ -201,6 +216,7 @@ class AuthenticationUseCasesTest {
         return User.builder()
                 .id(20)
                 .userName("Test user")
+                .handle(HANDLE)
                 .email(EMAIL)
                 .passwordHash(HASH)
                 .build();

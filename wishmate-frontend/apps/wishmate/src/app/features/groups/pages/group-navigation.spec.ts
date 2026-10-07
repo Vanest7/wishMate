@@ -5,7 +5,11 @@ import {
   withRouterConfig,
 } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { GroupsService, GroupMembersService } from '@wishmate/api-client';
+import {
+  EventsService,
+  GroupsService,
+  GroupMembersService,
+} from '@wishmate/api-client';
 import { of } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 import { groupsRoutes } from '../groups.routes';
@@ -25,6 +29,7 @@ describe('Group section navigation', () => {
           withRouterConfig({ paramsInheritanceStrategy: 'always' }),
         ),
         { provide: GroupsService, useValue: { getGroup } },
+        { provide: EventsService, useValue: { getEvents: () => of([]) } },
         { provide: GroupMembersService, useValue: { getMembers } },
       ],
     });

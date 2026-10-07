@@ -203,6 +203,7 @@ class UserServiceImplTest {
         return User.builder()
                 .id(USER_ID)
                 .userName("Test user")
+                .handle("test.user")
                 .email("user@example.test")
                 .passwordHash("test-password-hash")
                 .build();

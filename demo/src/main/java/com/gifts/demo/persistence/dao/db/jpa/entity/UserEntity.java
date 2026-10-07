@@ -9,7 +9,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "usuarios")
+@Table(
+        name = "usuarios",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_usuarios_username",
+                columnNames = "username"
+        )
+)
 public class UserEntity {
 
     @Id
@@ -18,6 +24,9 @@ public class UserEntity {
 
     @Column(name = "nombre", nullable = false, length = 100)
     private String userName;
+
+    @Column(name = "username", length = 30)
+    private String handle;
 
     @Column(name = "mail", nullable = false, unique = true, length = 150)
     private String mail;

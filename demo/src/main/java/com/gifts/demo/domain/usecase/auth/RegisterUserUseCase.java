@@ -6,6 +6,7 @@ import com.gifts.demo.common.exception.ValidationException;
 import com.gifts.demo.domain.model.User;
 import com.gifts.demo.domain.repository.UserRepository;
 import com.gifts.demo.domain.service.PasswordService;
+import com.gifts.demo.domain.service.HandlePolicy;
 import lombok.RequiredArgsConstructor;
 
 @DomainService
@@ -17,14 +18,21 @@ public class RegisterUserUseCase {
 
     public User execute(
             String userName,
+            String handle,
             String email,
             String password
     ) {
         validate(userName, email, password);
 
         String normalizedUserName = userName.trim();
+        String normalizedHandle = HandlePolicy.normalize(handle);
         String normalizedEmail = email.trim();
 
+        if (userRepository.existsByHandle(normalizedHandle)) {
+            throw new ResourceAlreadyExistsException(
+                    "A user with this handle already exists"
+            );
+        }
         if (userRepository.existsByEmail(normalizedEmail)) {
             throw new ResourceAlreadyExistsException(
                     "A user with this email already exists"
@@ -33,6 +41,7 @@ public class RegisterUserUseCase {
 
         User user = User.builder()
                 .userName(normalizedUserName)
+                .handle(normalizedHandle)
                 .email(normalizedEmail)
                 .passwordHash(passwordService.hash(password))
                 .build();

@@ -36,6 +36,7 @@ class JpaMappersTest {
 
         assertThat(entity.getId()).isEqualTo(20);
         assertThat(entity.getUserName()).isEqualTo("Test user");
+        assertThat(entity.getHandle()).isEqualTo("test.user");
         assertThat(entity.getMail()).isEqualTo("user@example.test");
         assertThat(entity.getPasswordHash()).isEqualTo("test-hash");
 
@@ -156,6 +157,7 @@ class JpaMappersTest {
         return User.builder()
                 .id(20)
                 .userName("Test user")
+                .handle("test.user")
                 .email("user@example.test")
                 .passwordHash("test-hash")
                 .build();

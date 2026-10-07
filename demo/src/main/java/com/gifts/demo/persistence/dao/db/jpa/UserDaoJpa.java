@@ -94,7 +94,30 @@ public class UserDaoJpa implements UserDaoDb {
     }
 
     @Override
+    public List<User> search(String query) {
+        String pattern = query
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
+
+        return userJpaRepository
+                .search(
+                        query,
+                        pattern,
+                        PageRequest.of(0, 20)
+                )
+                .stream()
+                .map(UserJpaMapper.INSTANCE::toUser)
+                .toList();
+    }
+
+    @Override
     public boolean existsByEmail(String email) {
         return userJpaRepository.existsByMail(email);
+    }
+
+    @Override
+    public boolean existsByHandle(String handle) {
+        return userJpaRepository.existsByHandleIgnoreCase(handle);
     }
 }

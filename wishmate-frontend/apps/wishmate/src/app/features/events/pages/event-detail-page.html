@@ -1,0 +1,83 @@
+<a mat-button [routerLink]="['/groups', groupId(), 'events']"
+  >← {{ content.back }}</a
+>
+@if (success()) {
+<p class="success" role="status">{{ success() }}</p>
+} @if (loading()) {
+<div class="state" role="status">
+  <p>{{ content.loadingDetail }}</p>
+  <mat-progress-bar mode="indeterminate" />
+</div>
+} @else if (error()) {
+<div class="state">
+  <p role="alert">{{ error() }}</p>
+  <button mat-stroked-button type="button" (click)="retry()">
+    {{ content.retry }}
+  </button>
+</div>
+} @else if (event(); as current) {
+<article class="event-detail" aria-labelledby="event-title">
+  <span class="status" [attr.data-status]="current.status"
+    >{{ content.states[current.status] }}</span
+  >
+  <h2 id="event-title">{{ current.name }}</h2>
+  <p class="description event-description">
+    {{ current.description || content.noDescription }}
+  </p>
+  <dl class="detail-dates">
+    <div>
+      <dt>{{ content.startDate }}</dt>
+      <dd>{{ formatDate(current.startDate) }}</dd>
+    </div>
+    <div>
+      <dt>{{ content.endDate }}</dt>
+      <dd>{{ formatDate(current.endDate) }}</dd>
+    </div>
+  </dl>
+  <p class="state-note">{{ content.stateDescriptions[current.status] }}</p>
+  <div class="actions">
+    @if (canAction(current.status, 'edit')) {
+    <button
+      mat-stroked-button
+      type="button"
+      (click)="act('edit')"
+      [disabled]="dialogOpen()"
+    >
+      {{ content.edit }}
+    </button>
+    } @if (canAction(current.status, 'activate')) {
+    <button
+      mat-flat-button
+      type="button"
+      (click)="act('activate')"
+      [disabled]="dialogOpen()"
+    >
+      {{ content.activate }}
+    </button>
+    } @if (canAction(current.status, 'close')) {
+    <button
+      mat-stroked-button
+      type="button"
+      (click)="act('close')"
+      [disabled]="dialogOpen()"
+    >
+      {{ content.close }}
+    </button>
+    } @if (canAction(current.status, 'archive')) {
+    <button
+      mat-stroked-button
+      type="button"
+      (click)="act('archive')"
+      [disabled]="dialogOpen()"
+    >
+      {{ content.archive }}
+    </button>
+    }
+    <a
+      mat-button
+      [routerLink]="['/groups', current.groupId, 'events', current.id, 'wishes']"
+      >{{ content.wishes }}</a
+    >
+  </div>
+</article>
+}

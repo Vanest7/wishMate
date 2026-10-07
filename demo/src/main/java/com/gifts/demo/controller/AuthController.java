@@ -74,6 +74,7 @@ public class AuthController {
     ) {
         User user = registerUserUseCase.execute(
                 request.userName(),
+                request.handle(),
                 request.email(),
                 request.password()
         );

@@ -1,0 +1,99 @@
+<h2 mat-dialog-title>{{ titles[data.mode] }}</h2>
+<form [formGroup]="form" (ngSubmit)="submit()" [attr.aria-busy]="pending()">
+  <mat-dialog-content>
+    <p>{{ descriptions[data.mode] }}</p>
+    @if (isForm) {
+    <mat-form-field appearance="outline">
+      <mat-label>{{ content.name }}</mat-label>
+      <input
+        matInput
+        formControlName="name"
+        maxlength="100"
+        autocomplete="off"
+        required
+      />
+      <mat-hint>{{ content.nameHint }}</mat-hint>
+      @if (form.controls.name.hasError('required')) {
+      <mat-error>{{ content.required }}</mat-error>
+      } @else if (form.controls.name.hasError('maxlength')) {
+      <mat-error>{{ content.nameTooLong }}</mat-error>
+      } @else {
+      <mat-error>{{ content.serverField }}</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ content.descriptionLabel }}</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        rows="3"
+        maxlength="255"
+      ></textarea>
+      <mat-hint>{{ content.descriptionHint }}</mat-hint>
+      <mat-error
+        >{{ form.controls.description.hasError('maxlength') ?
+        content.descriptionTooLong : content.serverField }}</mat-error
+      >
+    </mat-form-field>
+    <div class="date-fields">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ content.startDate }}</mat-label>
+        <input
+          matInput
+          type="date"
+          formControlName="startDate"
+          min="0001-01-01"
+          max="9999-12-31"
+        />
+        <mat-hint>{{ content.optionalDate }}</mat-hint>
+        <mat-error
+          >{{ form.controls.startDate.hasError('server') ? content.serverField :
+          content.invalidDate }}</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ content.endDate }}</mat-label>
+        <input
+          matInput
+          type="date"
+          formControlName="endDate"
+          min="0001-01-01"
+          max="9999-12-31"
+        />
+        <mat-hint>{{ content.optionalDate }}</mat-hint>
+        <mat-error
+          >{{ form.controls.endDate.hasError('server') ? content.serverField :
+          content.invalidDate }}</mat-error
+        >
+      </mat-form-field>
+    </div>
+    @if (form.hasError('dateRange') && (form.controls.startDate.touched ||
+    form.controls.endDate.touched)) {
+    <p class="error" role="alert">{{ content.invalidDateRange }}</p>
+    } @if (data.mode === 'create') {
+    <mat-form-field appearance="outline">
+      <mat-label>{{ content.initialStatus }}</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="DRAFT">{{ content.states.DRAFT }}</mat-option>
+        <mat-option value="ACTIVE">{{ content.states.ACTIVE }}</mat-option>
+      </mat-select>
+      <mat-error>{{ content.serverField }}</mat-error>
+    </mat-form-field>
+    <p class="hint">{{ content.statusHint }}</p>
+    } } @else if (data.mode !== 'create') {
+    <p class="event-name">{{ data.event.name }}</p>
+    } @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+    } @if (pending()) {
+    <p role="status">{{ content.pending }}</p>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()" [disabled]="pending()">
+      {{ content.cancel }}
+    </button>
+    <button mat-flat-button type="submit" [disabled]="pending()">
+      {{ labels[data.mode] }}
+    </button>
+  </mat-dialog-actions>
+</form>

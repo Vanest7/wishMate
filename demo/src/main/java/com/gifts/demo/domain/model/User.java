@@ -16,6 +16,7 @@ public class User {
 
     private Integer id;
     private String userName;
+    private String handle;
     private String email;
     private String passwordHash;
 }
