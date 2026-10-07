@@ -90,7 +90,7 @@ export class LoginPage {
           const directive = this.formDirective();
           if (directive) directive.resetForm();
           else this.form.reset();
-          void this.router.navigateByUrl('/dashboard', {
+          void this.router.navigateByUrl(this.destination(), {
             replaceUrl: true,
           });
         },
