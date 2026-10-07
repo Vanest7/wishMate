@@ -7,7 +7,14 @@ import {
   withRouterConfig,
 } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { of } from 'rxjs';
+import {
+  GroupsService,
+  EventsService,
+  GroupMembersService,
+  WishesService,
+} from '@wishmate/api-client';
 import { appRoutes } from './app.routes';
 import { SessionService } from './core/auth/session.service';
 
@@ -35,19 +42,66 @@ describe('Application navigation', () => {
     expect(harness.routeNativeElement?.textContent).toContain('Iniciar sesión');
   });
 
-  it('reads both parent IDs from a direct link and updates them on navigation', async () => {
-    TestBed.inject(SessionService).start('test-access-token', 900);
+  it('loads parent IDs but displays group and event names on navigation', async () => {
+    const getWishesByEvent = vi.fn(() => of([]));
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: GroupsService,
+          useValue: {
+            getGroup: ({ groupId }: { groupId: number }) =>
+              of({ id: groupId, name: groupId === 12 ? 'Familia' : 'Amigos' }),
+          },
+        },
+        {
+          provide: EventsService,
+          useValue: {
+            getEvent: ({
+              groupId,
+              eventId,
+            }: {
+              groupId: number;
+              eventId: number;
+            }) =>
+              of({
+                id: eventId,
+                groupId,
+                name: eventId === 34 ? 'Cumpleaños' : 'Navidad',
+                status: 'ACTIVE',
+              }),
+          },
+        },
+        {
+          provide: GroupMembersService,
+          useValue: {
+            getMembers: () =>
+              of([{ userId: 7, userName: 'Ana', role: 'MEMBER' }]),
+          },
+        },
+        { provide: WishesService, useValue: { getWishesByEvent } },
+      ],
+    });
+    TestBed.inject(SessionService).start(
+      `a.${btoa(JSON.stringify({ sub: '7' }))}.c`,
+      900,
+    );
     const harness = await RouterTestingHarness.create(
       '/groups/12/events/34/wishes',
     );
-    expect(harness.routeNativeElement?.textContent).toContain(
-      'Grupo 12 · Evento 34',
-    );
-    await harness.navigateByUrl('/groups/56/events/78/wishes');
-    expect(harness.routeNativeElement?.textContent).toContain(
-      'Grupo 56 · Evento 78',
-    );
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+    expect(harness.routeNativeElement?.textContent).toContain('Familia');
+    expect(harness.routeNativeElement?.textContent).toContain('Cumpleaños');
     expect(harness.routeNativeElement?.textContent).not.toContain('Grupo 12');
+    expect(getWishesByEvent).toHaveBeenCalledWith({ groupId: 12, eventId: 34 });
+    await harness.navigateByUrl('/groups/56/events/78/wishes');
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+    expect(harness.routeNativeElement?.textContent).toContain('Amigos');
+    expect(harness.routeNativeElement?.textContent).toContain('Navidad');
+    expect(harness.routeNativeElement?.textContent).not.toContain('Familia');
+    expect(harness.routeNativeElement?.textContent).not.toContain('Evento 78');
+    expect(getWishesByEvent).toHaveBeenCalledWith({ groupId: 56, eventId: 78 });
   });
 
   it('rejects malformed resource IDs without showing a resource page', async () => {

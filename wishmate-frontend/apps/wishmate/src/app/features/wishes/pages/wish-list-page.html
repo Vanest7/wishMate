@@ -1,0 +1,143 @@
+@if (loading()) {
+<div class="state" role="status">
+  <p>{{ content.loading }}</p>
+  <mat-progress-bar mode="indeterminate" />
+</div>
+} @else if (error()) {
+<div class="state">
+  <p role="alert">{{ error() }}</p>
+  <button mat-stroked-button type="button" (click)="retry()">
+    {{ content.retry }}
+  </button>
+</div>
+} @else if (data(); as current) {
+<nav class="breadcrumbs" [attr.aria-label]="content.navigation">
+  <a mat-button [routerLink]="['/groups', current.group.id]"
+    >{{ current.group.name }}</a
+  >
+  <span aria-hidden="true">/</span>
+  <a
+    mat-button
+    [routerLink]="['/groups', current.group.id, 'events', current.event.id]"
+    >{{ current.event.name }}</a
+  >
+</nav>
+<header class="page-heading">
+  <div>
+    <p class="eyebrow">{{ current.group.name }} · {{ current.event.name }}</p>
+    <h1>{{ content.title }}</h1>
+    <p class="description">{{ content.description }}</p>
+    <span class="event-status">{{ content.states[current.event.status] }}</span>
+  </div>
+  @if (canCreate()) {
+  <button
+    mat-flat-button
+    type="button"
+    (click)="create()"
+    [disabled]="dialogOpen()"
+  >
+    {{ content.create }}
+  </button>
+  }
+</header>
+@if (current.event.status !== 'ACTIVE') {
+<p class="state-note">{{ content.readOnly[current.event.status] }}</p>
+}
+<div class="toolbar">
+  <div class="filters" role="group" aria-label="Filtrar deseos">
+    <button
+      mat-button
+      type="button"
+      [attr.aria-pressed]="!mineOnly()"
+      (click)="mineOnly.set(false)"
+    >
+      {{ content.all }}
+    </button>
+    <button
+      mat-button
+      type="button"
+      [attr.aria-pressed]="mineOnly()"
+      (click)="mineOnly.set(true)"
+    >
+      {{ content.mine }}
+    </button>
+  </div>
+  <button mat-button type="button" (click)="retry()" [disabled]="dialogOpen()">
+    {{ content.refresh }}
+  </button>
+</div>
+@if (success()) {
+<p class="success" role="status">{{ success() }}</p>
+} @if (cards().length === 0) {
+<div class="state">
+  <h2>{{ mineOnly() ? content.emptyMineTitle : content.emptyTitle }}</h2>
+  <p>
+    {{ mineOnly() ? content.emptyMineDescription : content.emptyDescription }}
+  </p>
+</div>
+} @else {
+<ul class="wish-grid">
+  @for (card of cards(); track card.wish.id) {
+  <li class="wish-card">
+    <p class="owner" [class.mine]="card.isMine">
+      {{ card.isMine ? content.yours : content.owner + ' ' + card.ownerName }}
+    </p>
+    <h2>{{ card.wish.name }}</h2>
+    <p class="description wish-description">{{ card.wish.description }}</p>
+    @if (card.wish.estimatedPrice !== undefined && card.wish.estimatedPrice !==
+    null) {
+    <p class="price">
+      <span>{{ content.estimatedPrice }}</span><strong>{{ card.price }}</strong>
+    </p>
+    }
+    <div class="card-actions">
+      @if (card.purchaseHref) {
+      <a
+        mat-stroked-button
+        [href]="card.purchaseHref"
+        target="_blank"
+        rel="noopener noreferrer"
+        >{{ content.openLink }}<span class="visually-hidden"
+          >: {{ card.wish.name }}</span
+        ></a
+      >
+      } @else if (card.wish.purchaseUrl) {
+      <p class="link-note">{{ content.invalidStoredUrl }}</p>
+      } @if (card.canManage) {
+      <div class="owner-actions">
+        <button
+          mat-button
+          type="button"
+          (click)="edit('edit', card.wish)"
+          [disabled]="dialogOpen()"
+          [attr.aria-label]="content.edit + ': ' + card.wish.name"
+        >
+          {{ content.edit }}
+        </button>
+        <button
+          mat-icon-button
+          class="delete-action"
+          type="button"
+          (click)="edit('delete', card.wish)"
+          [disabled]="dialogOpen()"
+          [attr.aria-label]="content.delete + ': ' + card.wish.name"
+          [title]="content.delete"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
+          </svg>
+        </button>
+      </div>
+      }
+    </div>
+  </li>
+  }
+</ul>
+}
+<a
+  class="back-link"
+  mat-button
+  [routerLink]="['/groups', current.group.id, 'events', current.event.id]"
+  >← {{ content.back }}</a
+>
+}

@@ -1,0 +1,97 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<form [formGroup]="form" (ngSubmit)="submit()" [attr.aria-busy]="pending()">
+  <mat-dialog-content>
+    @if (data.mode === 'delete') {
+    <p>{{ content.deleteDescription }}</p>
+    <p class="wish-name">{{ data.wish.name }}</p>
+    } @else {
+    <p>
+      {{ data.mode === 'create' ? content.createDescription :
+      content.editDescription }}
+    </p>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ content.name }}</mat-label>
+      <input
+        matInput
+        formControlName="name"
+        maxlength="150"
+        required
+        autocomplete="off"
+      />
+      <mat-hint>{{ content.nameHint }}</mat-hint>
+      <mat-error
+        >{{ form.controls.name.hasError('required') ? content.requiredName :
+        form.controls.name.hasError('maxlength') ? content.nameTooLong :
+        content.serverField }}</mat-error
+      >
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ content.descriptionLabel }}</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        maxlength="255"
+        required
+        rows="3"
+      ></textarea>
+      <mat-hint>{{ content.descriptionHint }}</mat-hint>
+      <mat-error
+        >{{ form.controls.description.hasError('required') ?
+        content.requiredDescription :
+        form.controls.description.hasError('maxlength') ?
+        content.descriptionTooLong : content.serverField }}</mat-error
+      >
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ content.purchaseUrl }}</mat-label>
+      <input
+        matInput
+        formControlName="purchaseUrl"
+        type="url"
+        maxlength="2048"
+        autocomplete="off"
+      />
+      <mat-hint>{{ content.urlHint }}</mat-hint>
+      <mat-error
+        >{{ form.controls.purchaseUrl.hasError('server') ? content.serverField :
+        content.invalidUrl }}</mat-error
+      >
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ content.estimatedPrice }}</mat-label>
+      <input
+        matInput
+        formControlName="estimatedPrice"
+        type="text"
+        inputmode="decimal"
+        autocomplete="off"
+      />
+      <mat-hint>{{ content.priceHint }}</mat-hint>
+      <mat-error
+        >{{ form.controls.estimatedPrice.hasError('server') ?
+        content.serverField : content.invalidPrice }}</mat-error
+      >
+    </mat-form-field>
+    } @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+    } @if (pending()) {
+    <p role="status">
+      {{ data.mode === 'delete' ? content.deleting : content.pending }}
+    </p>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()" [disabled]="pending()">
+      {{ content.cancel }}
+    </button>
+    <button
+      mat-flat-button
+      type="submit"
+      [disabled]="pending()"
+      [class.danger]="data.mode === 'delete'"
+    >
+      {{ data.mode === 'delete' ? content.delete : data.mode === 'create' ?
+      content.create : content.save }}
+    </button>
+  </mat-dialog-actions>
+</form>
