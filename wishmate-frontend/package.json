@@ -11,6 +11,7 @@
     "lint:fix": "nx run-many --target=lint --fix",
     "format": "nx format:write --all",
     "format:check": "nx format:check --all",
+    "fix-format:all": "nx format:write --all",
     "check": "npm run format:check && npm run lint && npm test && npm run build",
     "graph": "nx graph",
     "reset": "nx reset",
