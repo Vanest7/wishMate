@@ -23,6 +23,9 @@ export type ValidWish = WishResponse & {
   name: string;
   description: string;
 };
+type WishWithReservationStatus = WishResponse & {
+  reserved?: boolean;
+};
 export interface WishPageData {
   group: GroupResponse & { id: number; name: string };
   event: WishEvent;
@@ -71,8 +74,8 @@ export function canManageWish(
     wish.userId === userId
   );
 }
-export function checkReserved(wish: WishResponse): boolean {
-  return 'reserved' in wish && wish.reserved === true;
+export function checkReserved(wish: WishWithReservationStatus): boolean {
+  return wish.reserved === true;
 }
 export function safePurchaseUrl(
   value: string | null | undefined,

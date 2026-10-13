@@ -70,8 +70,16 @@ h3 {
   flex-direction: column;
   align-items: flex-start;
 }
-.event-card a {
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
   margin-top: auto;
+
+  a {
+    min-height: 44px;
+  }
 }
 .card-description {
   display: -webkit-box;
@@ -156,5 +164,8 @@ h3 {
   .actions > * {
     width: 100%;
     min-height: 44px;
+  }
+  .card-actions a {
+    flex: 1 1 100%;
   }
 }

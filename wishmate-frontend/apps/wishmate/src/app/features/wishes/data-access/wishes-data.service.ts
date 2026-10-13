@@ -5,7 +5,7 @@ import {
   GroupMembersService,
   WishesService,
 } from '@wishmate/api-client';
-import { forkJoin, map, Observable, switchMap } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import {
   ValidWish,
   validWish,
@@ -40,25 +40,29 @@ export class WishesDataService {
           new Set(wishes.map((wish) => wish.id)).size !== wishes.length
         )
           throw new Error('Invalid wish page response');
-        return forkJoin(
-          wishes.map((wish) =>
-            this.api
-              .getWishReservationStatus({
-                groupId,
-                eventId,
-                wishId: wish.id,
-              })
-              .pipe(
-                map(
-                  (status) =>
-                    status === 'RESERVED' || status === 'RESERVED_BY_ME',
-                ),
+        const groupName = group.name;
+        const reservationStatuses$ = wishes.length
+          ? forkJoin(
+              wishes.map((wish) =>
+                this.api
+                  .getWishReservationStatus({
+                    groupId,
+                    eventId,
+                    wishId: wish.id,
+                  })
+                  .pipe(
+                    map(
+                      (status) =>
+                        status === 'RESERVED' || status === 'RESERVED_BY_ME',
+                    ),
+                  ),
               ),
-          ),
-        ).pipe(
+            )
+          : of<boolean[]>([]);
+        return reservationStatuses$.pipe(
           map(
             (reserved): WishPageData => ({
-              group: { ...group, id: groupId, name: group.name },
+              group: { ...group, id: groupId, name: groupName },
               event,
               wishes: wishes.map((wish, index) => ({
                 ...wish,

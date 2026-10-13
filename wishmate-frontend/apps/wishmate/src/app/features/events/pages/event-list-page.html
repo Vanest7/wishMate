@@ -64,13 +64,23 @@
       <p>{{ content.noDates }}</p>
       }
     </div>
-    <a
-      mat-stroked-button
-      [routerLink]="['/groups', groupId(), 'events', event.id]"
-      >{{ content.open }}<span class="visually-hidden"
-        >: {{ event.name }}</span
-      ></a
-    >
+    <div class="card-actions">
+      <a
+        mat-stroked-button
+        [routerLink]="['/groups', groupId(), 'events', event.id]"
+      >
+        {{ content.open }}
+        <span class="visually-hidden">: {{ event.name }}</span>
+      </a>
+
+      <a
+        mat-flat-button
+        [routerLink]="['/groups', groupId(), 'events', event.id, 'wishes']"
+      >
+        {{ content.wishes }}
+        <span class="visually-hidden">: {{ event.name }}</span>
+      </a>
+    </div>
   </li>
   }
 </ul>

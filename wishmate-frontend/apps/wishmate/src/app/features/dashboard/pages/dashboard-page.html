@@ -14,10 +14,15 @@
     [actionLabel]="card.action"
     [style.--card-icon-color]="card.iconColor"
     [style.--card-icon-background]="card.iconBackground"
+    (click)="goToQuickAccess(card.query?.section, $event)"
   />
   }
 </nav>
-<section class="quick-access" aria-labelledby="quick-title">
+<h2 #quickAccessHeading id="quick-title" tabindex="-1">
+  {{ section() === 'events' ? 'Acceso rápido a eventos' : 'Acceso rápido a
+  deseos' }}
+</h2>
+<section #quickAccessSection class="quick-access" aria-labelledby="quick-title">
   <h2 id="quick-title">
     {{ section() === 'events' ? 'Acceso rápido a eventos' : 'Acceso rápido a
     deseos' }}
@@ -36,6 +41,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Grupo</mat-label>
     <mat-select
+      #groupSelect
       [value]="groupId()"
       (selectionChange)="selectGroup($event.value)"
     >

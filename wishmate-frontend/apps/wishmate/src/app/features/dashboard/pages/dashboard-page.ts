@@ -8,14 +8,16 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  ElementRef,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import {
   catchError,
@@ -28,6 +30,7 @@ import {
   combineLatest,
 } from 'rxjs';
 import { NavigationCard } from '../../../shared/ui/navigation-card/navigation-card';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -105,7 +108,15 @@ export class DashboardPage {
     },
   ];
   readonly statusLabels = eventStatusLabels;
+  private readonly document = inject(DOCUMENT);
 
+  private readonly quickAccessSection =
+    viewChild.required<ElementRef<HTMLElement>>('quickAccessSection');
+
+  private readonly quickAccessHeading =
+    viewChild.required<ElementRef<HTMLHeadingElement>>('quickAccessHeading');
+
+  private readonly groupSelect = viewChild<MatSelect>('groupSelect');
   constructor() {
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       this.section.set(
@@ -176,5 +187,48 @@ export class DashboardPage {
   }
   retryEvents(): void {
     this.eventReload.next();
+  }
+  goToQuickAccess(section: string | undefined, event: MouseEvent): void {
+    if (section !== 'events' && section !== 'wishes') {
+      return;
+    }
+    if (
+      event.button !== 0 ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+    this.section.set(section);
+    const prefersReducedMotion =
+      this.document.defaultView?.matchMedia?.(
+        '(prefers-reduced-motion: reduce)',
+      )?.matches ?? false;
+
+    const behavior = prefersReducedMotion ? 'instant' : 'smooth';
+
+    const select = this.groupSelect();
+
+    if (select) {
+      select.focus({ preventScroll: true });
+
+      select._elementRef.nativeElement.scrollIntoView({
+        behavior,
+        block: 'center',
+        inline: 'nearest',
+      });
+      return;
+    }
+
+    this.quickAccessHeading().nativeElement.focus({
+      preventScroll: true,
+    });
+
+    this.quickAccessSection().nativeElement.scrollIntoView({
+      behavior,
+      block: 'start',
+    });
   }
 }
