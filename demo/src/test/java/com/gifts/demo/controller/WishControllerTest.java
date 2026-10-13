@@ -11,6 +11,8 @@ import com.gifts.demo.domain.usecase.wish.GetWishUseCase;
 import com.gifts.demo.domain.usecase.wish.GetWishesByEventUseCase;
 import com.gifts.demo.domain.usecase.wish.GetWishesByUserUseCase;
 import com.gifts.demo.domain.usecase.wish.UpdateWishUseCase;
+import com.gifts.demo.domain.usecase.reservation.GetWishReservationStatusUseCase;
+import com.gifts.demo.domain.model.WishReservationStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -69,6 +71,9 @@ class WishControllerTest {
     private DeleteWishUseCase deleteWishUseCase;
 
     @MockitoBean
+    private GetWishReservationStatusUseCase getWishReservationStatusUseCase;
+
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
     @Test
@@ -116,6 +121,31 @@ class WishControllerTest {
                 .andExpect(jsonPath("$[0].id").value(6));
 
         verify(getWishesByEventUseCase).execute(1, 4, 20);
+    }
+
+    @Test
+    void shouldReturnVisibleWishReservationStatus() throws Exception {
+        when(getWishReservationStatusUseCase.execute(1, 4, 6, 20))
+                .thenReturn(java.util.Optional.of(
+                        WishReservationStatus.RESERVED_BY_ME
+                ));
+
+        mockMvc.perform(get(BASE_URL + "/6/reservation-status")
+                        .with(jwt().jwt(token -> token.subject("20"))))
+                .andExpect(status().isOk())
+                .andExpect(content().string("\"RESERVED_BY_ME\""));
+
+        verify(getWishReservationStatusUseCase).execute(1, 4, 6, 20);
+    }
+
+    @Test
+    void shouldHideWishOwnerReservationStatus() throws Exception {
+        when(getWishReservationStatusUseCase.execute(1, 4, 6, 20))
+                .thenReturn(java.util.Optional.empty());
+
+        mockMvc.perform(get(BASE_URL + "/6/reservation-status")
+                        .with(jwt().jwt(token -> token.subject("20"))))
+                .andExpect(status().isNoContent());
     }
 
     @Test

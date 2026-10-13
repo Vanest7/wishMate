@@ -1,6 +1,5 @@
 import {
   ApplicationConfig,
-  isDevMode,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -22,8 +21,6 @@ export const appConfig: ApplicationConfig = {
       withRouterConfig({ paramsInheritanceStrategy: 'always' }),
     ),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideApiConfiguration(
-      isDevMode() ? 'http://localhost:8080' : window.location.origin,
-    ),
+    provideApiConfiguration(window.location.origin),
   ],
 };

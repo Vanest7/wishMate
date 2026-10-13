@@ -20,6 +20,8 @@ import { getWishesByEvent } from '../fn/wishes/get-wishes-by-event';
 import { GetWishesByEvent$Params } from '../fn/wishes/get-wishes-by-event';
 import { getWishesByUser } from '../fn/wishes/get-wishes-by-user';
 import { GetWishesByUser$Params } from '../fn/wishes/get-wishes-by-user';
+import { getWishReservationStatus } from '../fn/wishes/get-wish-reservation-status';
+import { GetWishReservationStatus$Params } from '../fn/wishes/get-wish-reservation-status';
 import { updateWish } from '../fn/wishes/update-wish';
 import { UpdateWish$Params } from '../fn/wishes/update-wish';
 import { WishResponse } from '../models/wish-response';
@@ -152,6 +154,59 @@ export class WishesService extends BaseService {
   ): Observable<void> {
     const resp = this.deleteWish$Response(params, context);
     return resp.pipe(map((r: StrictHttpResponse<void>): void => r.body));
+  }
+
+  /** Path part for operation `getWishReservationStatus()` */
+  static readonly GetWishReservationStatusPath =
+    '/api/groups/{groupId}/events/{eventId}/wishes/{wishId}/reservation-status';
+
+  /**
+   * Get a wish reservation status.
+   *
+   * Returns the status visible to the authenticated group member. The wish owner receives no status.
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getWishReservationStatus()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getWishReservationStatus$Response(
+    params: GetWishReservationStatus$Params,
+    context?: HttpContext,
+  ): Observable<
+    StrictHttpResponse<'AVAILABLE' | 'RESERVED' | 'RESERVED_BY_ME'>
+  > {
+    const obs = getWishReservationStatus(
+      this.http,
+      this.rootUrl,
+      params,
+      context,
+    );
+    return obs;
+  }
+
+  /**
+   * Get a wish reservation status.
+   *
+   * Returns the status visible to the authenticated group member. The wish owner receives no status.
+   *
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getWishReservationStatus$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getWishReservationStatus(
+    params: GetWishReservationStatus$Params,
+    context?: HttpContext,
+  ): Observable<'AVAILABLE' | 'RESERVED' | 'RESERVED_BY_ME'> {
+    const resp = this.getWishReservationStatus$Response(params, context);
+    return resp.pipe(
+      map(
+        (
+          r: StrictHttpResponse<'AVAILABLE' | 'RESERVED' | 'RESERVED_BY_ME'>,
+        ): 'AVAILABLE' | 'RESERVED' | 'RESERVED_BY_ME' => r.body,
+      ),
+    );
   }
 
   /** Path part for operation `getWishesByEvent()` */

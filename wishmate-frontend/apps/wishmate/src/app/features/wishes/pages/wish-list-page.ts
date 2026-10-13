@@ -27,6 +27,7 @@ import {
 import { SessionService } from '../../../core/auth/session.service';
 import {
   canManageWish,
+  checkReserved,
   formatPrice,
   positiveId,
   safePurchaseUrl,
@@ -85,6 +86,7 @@ export class WishListPage {
       ownerName: names.get(wish.userId) || this.content.unknownOwner,
       isMine: wish.userId === userId,
       canManage: canManageWish(wish, data.event, userId),
+      reserved: checkReserved(wish),
       purchaseHref: safePurchaseUrl(wish.purchaseUrl),
       price: formatPrice(wish.estimatedPrice),
     }));

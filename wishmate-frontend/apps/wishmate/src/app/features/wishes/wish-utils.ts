@@ -71,6 +71,9 @@ export function canManageWish(
     wish.userId === userId
   );
 }
+export function checkReserved(wish: WishResponse): boolean {
+  return 'reserved' in wish && wish.reserved === true;
+}
 export function safePurchaseUrl(
   value: string | null | undefined,
 ): string | null {

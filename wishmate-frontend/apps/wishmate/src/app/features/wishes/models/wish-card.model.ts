@@ -5,6 +5,7 @@ export interface WishCardModel {
   ownerName: string;
   isMine: boolean;
   canManage: boolean;
+  reserved: boolean;
   purchaseHref: string | null;
   price: string;
 }

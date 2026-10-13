@@ -19,8 +19,8 @@ export const authContent = {
       'Ahora puedes iniciar sesión con tu correo y contraseña.',
   },
   fields: {
-    userName: 'Nombre de usuario',
-    handle: 'NickName',
+    userName: 'Nombre completo',
+    handle: 'Nombre de usuario',
     email: 'Correo electrónico',
     password: 'Contraseña',
     confirmPassword: 'Repite la contraseña',

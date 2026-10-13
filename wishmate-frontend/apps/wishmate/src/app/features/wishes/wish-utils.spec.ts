@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   canManageWish,
+  checkReserved,
   formatPrice,
   parsePrice,
   safePurchaseUrl,
@@ -22,6 +23,11 @@ describe('Wish rules', () => {
     expect(canManageWish(wish, { id: 4, status: 'ACTIVE' }, 8)).toBe(false);
     expect(canManageWish(wish, { id: 5, status: 'ACTIVE' }, 7)).toBe(false);
     expect(canManageWish(wish, { id: 4, status: 'ACTIVE' }, null)).toBe(false);
+  });
+  it('detects reservations without exposing reservation details', () => {
+    expect(checkReserved({ reserved: true })).toBe(true);
+    expect(checkReserved({ reserved: false })).toBe(false);
+    expect(checkReserved({})).toBe(false);
   });
   it.each(['-1', '100000000', '1,001', '1.000,50', '1e2', 'abc', 'NaN'])(
     'rejects invalid price %s',

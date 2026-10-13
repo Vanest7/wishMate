@@ -60,6 +60,9 @@
         "development": {
           "buildTarget": "wishmate:build:development"
         }
+      },
+      "options": {
+        "proxyConfig": "apps/wishmate/proxy.conf.json"
       }
     },
     "lint": {

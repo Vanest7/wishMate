@@ -39,14 +39,20 @@ const other: ValidWish = {
 describe('Wish list', () => {
   let wishes: Subject<WishResponse[]>;
   let params: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
-  let api: { getWishesByEvent: ReturnType<typeof vi.fn> };
+  let api: {
+    getWishesByEvent: ReturnType<typeof vi.fn>;
+    getWishReservationStatus: ReturnType<typeof vi.fn>;
+  };
   let events: { getEvent: ReturnType<typeof vi.fn> };
   beforeEach(() => {
     wishes = new Subject();
     params = new BehaviorSubject(
       convertToParamMap({ groupId: '1', eventId: '4' }),
     );
-    api = { getWishesByEvent: vi.fn(() => wishes) };
+    api = {
+      getWishesByEvent: vi.fn(() => wishes),
+      getWishReservationStatus: vi.fn(() => of('AVAILABLE')),
+    };
     events = {
       getEvent: vi.fn(() =>
         of({ id: 4, groupId: 1, name: 'Cumpleaños de Ana', status: 'ACTIVE' }),

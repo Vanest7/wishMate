@@ -24,7 +24,11 @@
     >
     } @else if (card.wish.purchaseUrl) {
     <p class="link-note">{{ content.invalidStoredUrl }}</p>
-    } @if (!card.isMine && canReserve()) {
+    } @if (!card.isMine && card.reserved) {
+    <button mat-flat-button type="button" [disabled]="true">
+      Regalo reservado
+    </button>
+    } @else if (!card.isMine && canReserve()) {
     <a
       mat-flat-button
       [routerLink]="['/reservations/new', groupId(), eventId(), card.wish.id]"

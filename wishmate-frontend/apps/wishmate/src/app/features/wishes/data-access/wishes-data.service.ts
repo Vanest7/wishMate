@@ -5,7 +5,7 @@ import {
   GroupMembersService,
   WishesService,
 } from '@wishmate/api-client';
-import { forkJoin, map, Observable } from 'rxjs';
+import { forkJoin, map, Observable, switchMap } from 'rxjs';
 import {
   ValidWish,
   validWish,
@@ -27,7 +27,7 @@ export class WishesDataService {
       wishes: this.api.getWishesByEvent({ groupId, eventId }),
       members: this.membersApi.getMembers({ groupId }),
     }).pipe(
-      map(({ group, event, wishes, members }): WishPageData => {
+      switchMap(({ group, event, wishes, members }) => {
         if (
           !group ||
           group.id !== groupId ||
@@ -40,12 +40,34 @@ export class WishesDataService {
           new Set(wishes.map((wish) => wish.id)).size !== wishes.length
         )
           throw new Error('Invalid wish page response');
-        return {
-          group: { ...group, id: groupId, name: group.name },
-          event,
-          wishes,
-          members,
-        };
+        return forkJoin(
+          wishes.map((wish) =>
+            this.api
+              .getWishReservationStatus({
+                groupId,
+                eventId,
+                wishId: wish.id,
+              })
+              .pipe(
+                map(
+                  (status) =>
+                    status === 'RESERVED' || status === 'RESERVED_BY_ME',
+                ),
+              ),
+          ),
+        ).pipe(
+          map(
+            (reserved): WishPageData => ({
+              group: { ...group, id: groupId, name: group.name },
+              event,
+              wishes: wishes.map((wish, index) => ({
+                ...wish,
+                reserved: reserved[index],
+              })),
+              members,
+            }),
+          ),
+        );
       }),
     );
   }

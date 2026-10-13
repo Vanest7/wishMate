@@ -15,6 +15,7 @@ const model: WishCardModel = {
   ownerName: 'Ana',
   isMine: true,
   canManage: true,
+  reserved: false,
   purchaseHref: null,
   price: '—',
 };
@@ -65,5 +66,20 @@ describe('Wish card presentation', () => {
       element.querySelector('a[href="/reservations/new/1/4/5"]'),
     ).not.toBeNull();
     expect(element.querySelector('button')).toBeNull();
+  });
+  it('shows a disabled reserved button instead of a reservation link', async () => {
+    const fixture = await setup();
+    fixture.componentRef.setInput('model', {
+      ...model,
+      isMine: false,
+      canManage: false,
+      reserved: true,
+    });
+    await fixture.whenStable();
+    const element = fixture.nativeElement as HTMLElement;
+    const button = element.querySelector<HTMLButtonElement>('button');
+    expect(button?.textContent).toContain('Regalo reservado');
+    expect(button?.disabled).toBe(true);
+    expect(element.querySelector('a[href^="/reservations/new"]')).toBeNull();
   });
 });

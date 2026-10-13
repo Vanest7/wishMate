@@ -1,0 +1,7 @@
+{
+  "/api/**": {
+    "target": "https://wishmate-9gla.onrender.com",
+    "secure": true,
+    "changeOrigin": true
+  }
+}

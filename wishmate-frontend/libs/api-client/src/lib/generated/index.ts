@@ -56,6 +56,8 @@ export type { UpdateWish$Params as UpdateWish$Params } from './fn/wishes/update-
 export { updateWish as updateWish } from './fn/wishes/update-wish';
 export type { DeleteWish$Params as DeleteWish$Params } from './fn/wishes/delete-wish';
 export { deleteWish as deleteWish } from './fn/wishes/delete-wish';
+export type { GetWishReservationStatus$Params as GetWishReservationStatus$Params } from './fn/wishes/get-wish-reservation-status';
+export { getWishReservationStatus as getWishReservationStatus } from './fn/wishes/get-wish-reservation-status';
 export type { GetWishesByEvent$Params as GetWishesByEvent$Params } from './fn/wishes/get-wishes-by-event';
 export { getWishesByEvent as getWishesByEvent } from './fn/wishes/get-wishes-by-event';
 export type { CreateWish$Params as CreateWish$Params } from './fn/wishes/create-wish';

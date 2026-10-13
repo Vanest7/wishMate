@@ -15,12 +15,14 @@ import com.gifts.demo.controller.webmodel.wish.CreateWishRequest;
 import com.gifts.demo.controller.webmodel.wish.UpdateWishRequest;
 import com.gifts.demo.controller.webmodel.wish.WishResponse;
 import com.gifts.demo.domain.model.Wish;
+import com.gifts.demo.domain.model.WishReservationStatus;
 import com.gifts.demo.domain.usecase.wish.CreateWishUseCase;
 import com.gifts.demo.domain.usecase.wish.DeleteWishUseCase;
 import com.gifts.demo.domain.usecase.wish.GetWishUseCase;
 import com.gifts.demo.domain.usecase.wish.GetWishesByEventUseCase;
 import com.gifts.demo.domain.usecase.wish.GetWishesByUserUseCase;
 import com.gifts.demo.domain.usecase.wish.UpdateWishUseCase;
+import com.gifts.demo.domain.usecase.reservation.GetWishReservationStatusUseCase;
 import com.gifts.demo.security.currentUser.CurrentUserProvider;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -56,8 +58,40 @@ public class WishController {
     private final CreateWishUseCase createWishUseCase;
     private final UpdateWishUseCase updateWishUseCase;
     private final DeleteWishUseCase deleteWishUseCase;
+    private final GetWishReservationStatusUseCase getWishReservationStatusUseCase;
 
     private final CurrentUserProvider currentUserProvider;
+
+    @Operation(summary = "Get a wish reservation status",
+            description = "Returns the status visible to the authenticated group member. The wish owner receives no status.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Reservation status returned",
+                    useReturnTypeSchema = true),
+        @ApiResponse(responseCode = "204", description = "Reservation status is hidden from the wish owner",
+                    content = @Content),
+        @ApiResponse(responseCode = "401", description = "Authentication is missing or invalid.",
+                    content = @Content),
+        @ApiResponse(responseCode = "403", description = "Access is denied.",
+                    content = @Content),
+        @ApiResponse(responseCode = "404", description = "The group, event or wish was not found.",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/{wishId}/reservation-status")
+    public ResponseEntity<WishReservationStatus> getReservationStatus(
+            @PathVariable("groupId") Integer groupId,
+            @PathVariable("eventId") Integer eventId,
+            @PathVariable("wishId") Integer wishId
+    ) {
+        return getWishReservationStatusUseCase.execute(
+                        groupId,
+                        eventId,
+                        wishId,
+                        currentUserProvider.getCurrentUserId()
+                )
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
 
     @Operation(summary = "List event wishes",
             description = "Requires group membership. Returns an array of wishes.")

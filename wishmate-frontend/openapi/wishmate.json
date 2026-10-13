@@ -905,6 +905,65 @@
         "security": [{ "bearerAuth": [], "csrfToken": [] }]
       }
     },
+    "/api/groups/{groupId}/events/{eventId}/wishes/{wishId}/reservation-status": {
+      "get": {
+        "tags": ["Wishes"],
+        "summary": "Get a wish reservation status",
+        "description": "Returns the status visible to the authenticated group member. The wish owner receives no status.",
+        "operationId": "getWishReservationStatus",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" }
+          },
+          {
+            "name": "wishId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reservation status returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "enum": ["AVAILABLE", "RESERVED", "RESERVED_BY_ME"]
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Reservation status is hidden from the wish owner"
+          },
+          "401": {
+            "description": "Authentication is missing or invalid."
+          },
+          "403": {
+            "description": "Access is denied."
+          },
+          "404": {
+            "description": "The group, event or wish was not found.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
     "/api/groups/{groupId}/events/{eventId}/wishes": {
       "get": {
         "tags": ["Wishes"],
