@@ -99,4 +99,31 @@ describe('DashboardPage', () => {
     expect(getEvents).not.toHaveBeenCalled();
     expect(fixture.nativeElement.textContent).toContain('Aún no perteneces');
   });
+  it.each(['events', 'wishes'] as const)(
+    'makes the whole row a single link to %s',
+    async (section) => {
+      const fixture = TestBed.createComponent(DashboardPage);
+      await fixture.whenStable();
+      fixture.componentInstance.section.set(section);
+      fixture.componentInstance.selectGroup(1);
+      await fixture.whenStable();
+      const element = fixture.nativeElement as HTMLElement;
+      const row = element.querySelector('li');
+      const link = row?.querySelector<HTMLAnchorElement>('a.quick-access-item');
+      expect(link).not.toBeNull();
+      expect(link?.getAttribute('href')).toBe(
+        section === 'events'
+          ? '/groups/1/events/7'
+          : '/groups/1/events/7/wishes',
+      );
+      expect(link?.textContent).toContain('Navidad');
+      expect(link?.textContent).toContain('Familia');
+      expect(link?.getAttribute('aria-label')).toBe(
+        section === 'events' ? 'Ver evento: Navidad' : 'Ver deseos de: Navidad',
+      );
+      expect(row?.querySelectorAll('a')).toHaveLength(1);
+      expect(row?.querySelector('button')).toBeNull();
+      expect(link?.tabIndex).toBe(0);
+    },
+  );
 });

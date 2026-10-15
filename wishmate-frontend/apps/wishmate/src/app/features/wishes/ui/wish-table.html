@@ -4,21 +4,44 @@
   [attr.aria-label]="content.view.tableLabel"
   tabindex="0"
 >
-  <table>
+  <table
+    matSort
+    [matSortActive]="sort().active"
+    [matSortDirection]="sort().direction"
+    (matSortChange)="changeSort($event)"
+  >
     <caption class="visually-hidden">
       {{ content.view.tableLabel }}
     </caption>
     <thead>
       <tr>
-        <th scope="col">{{ content.view.wish }}</th>
-        <th scope="col">{{ content.view.person }}</th>
-        <th scope="col">{{ content.estimatedPrice }}</th>
+        <th
+          scope="col"
+          mat-sort-header="name"
+          [sortActionDescription]="content.sort.name"
+        >
+          {{ content.view.wish }}
+        </th>
+        <th
+          scope="col"
+          mat-sort-header="owner"
+          [sortActionDescription]="content.sort.owner"
+        >
+          {{ content.view.person }}
+        </th>
+        <th
+          scope="col"
+          mat-sort-header="price"
+          [sortActionDescription]="content.sort.price"
+        >
+          {{ content.estimatedPrice }}
+        </th>
         <th scope="col">{{ content.view.link }}</th>
         <th scope="col">{{ content.view.actions }}</th>
       </tr>
     </thead>
     <tbody>
-      @for (card of models(); track card.wish.id) {
+      @for (card of visibleModels(); track card.wish.id) {
       <tr>
         <th scope="row" class="wish-details">
           <span class="wish-name">{{ card.wish.name }}</span>
@@ -83,3 +106,12 @@
     </tbody>
   </table>
 </div>
+<mat-paginator
+  [length]="models().length"
+  [pageIndex]="pageIndex()"
+  [pageSize]="pageSize()"
+  [pageSizeOptions]="[5, 10, 25, 50]"
+  [showFirstLastButtons]="true"
+  [attr.aria-label]="content.pagination.label"
+  (page)="changePage($event)"
+/>

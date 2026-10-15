@@ -1,5 +1,18 @@
 import { eventStatusLabels } from '../../shared/domain/event-status';
 export const wishesContent = {
+  sort: {
+    name: 'Ordenar por deseo',
+    owner: 'Ordenar por persona',
+    price: 'Ordenar por precio orientativo',
+  },
+  pagination: {
+    label: 'Paginación de deseos',
+    itemsPerPage: 'Deseos por página',
+    next: 'Página siguiente',
+    previous: 'Página anterior',
+    first: 'Primera página',
+    last: 'Última página',
+  },
   view: {
     label: 'Vista de los deseos',
     cards: 'Tarjetas',

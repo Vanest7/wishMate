@@ -36,28 +36,50 @@ ul {
   margin: 8px 0 20px;
 }
 li {
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+.quick-access-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: 16px;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  padding: 20px 16px;
+  border-radius: 12px;
+  color: var(--mat-sys-on-surface);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
 }
-li div {
+.quick-access-item:hover,
+.quick-access-item:focus-visible {
+  background: var(--mat-sys-surface-container-high);
+}
+.quick-access-item:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: -2px;
+}
+.item-content {
   min-width: 0;
   overflow-wrap: anywhere;
 }
-li span {
+.item-details {
   display: block;
   margin-top: 6px;
   color: var(--mat-sys-on-surface-variant);
 }
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+.item-chevron {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--mat-sys-primary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .quick-access-item {
+    transition: none;
+  }
 }

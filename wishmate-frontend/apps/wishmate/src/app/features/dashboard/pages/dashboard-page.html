@@ -61,21 +61,27 @@
   <ul>
     @for (event of events(); track event.id) {
     <li>
-      <div>
-        <strong>{{ event.name }}</strong
-        ><span
-          >{{ current.name }} · {{ event.status ? statusLabels[event.status] :
-          'Estado no disponible' }}</span
-        >
-      </div>
       <a
-        mat-stroked-button
+        class="quick-access-item"
         [routerLink]="section() === 'events' ? ['/groups', current.id, 'events', event.id] : ['/groups', current.id, 'events', event.id, 'wishes']"
-        >{{ section() === 'events' ? 'Ver evento' : event.status === 'ACTIVE' ?
-        'Ver y añadir deseos' : 'Consultar deseos' }}<span class="sr-only"
-          >: {{ event.name }}</span
-        ></a
+        [attr.aria-label]="(section() === 'events' ? 'Ver evento: ' : 'Ver deseos de: ') + event.name"
       >
+        <span class="item-content">
+          <strong>{{ event.name }}</strong>
+          <span class="item-details"
+            >{{ current.name }} · {{ event.status ? statusLabels[event.status] :
+            'Estado no disponible' }}</span
+          >
+        </span>
+        <svg
+          class="item-chevron"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="m9 5 7 7-7 7" />
+        </svg>
+      </a>
     </li>
     }
   </ul>
