@@ -205,4 +205,59 @@ describe('Wish list', () => {
     expect(page.data()?.wishes.map((wish) => wish.id)).toEqual([other.id]);
     expect(api.getWishesByEvent).toHaveBeenCalledTimes(1);
   });
+  it('switches views without reloading and preserves the selected filter', async () => {
+    const fixture = TestBed.createComponent(WishListPage);
+    await fixture.whenStable();
+    wishes.next([own, other]);
+    wishes.complete();
+    await fixture.whenStable();
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelectorAll('app-wish-card')).toHaveLength(2);
+    const statusRequestCount = api.getWishReservationStatus.mock.calls.length;
+    const buttons = element.querySelectorAll<HTMLButtonElement>(
+      '.view-switch button',
+    );
+    buttons[1].click();
+    await fixture.whenStable();
+    expect(buttons[1].getAttribute('aria-pressed')).toBe('true');
+    expect(element.querySelector('app-wish-card')).toBeNull();
+    expect(element.querySelectorAll('tbody tr')).toHaveLength(2);
+    element.querySelectorAll<HTMLButtonElement>('.filters button')[1].click();
+    await fixture.whenStable();
+    expect(element.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(element.querySelector('tbody')?.textContent).toContain('Book');
+    expect(element.querySelector('tbody')?.textContent).not.toContain(
+      'Headphones',
+    );
+    buttons[0].click();
+    await fixture.whenStable();
+    expect(element.querySelector('table')).toBeNull();
+    expect(element.querySelectorAll('app-wish-card')).toHaveLength(1);
+    expect(api.getWishesByEvent).toHaveBeenCalledTimes(1);
+    expect(api.getWishReservationStatus).toHaveBeenCalledTimes(
+      statusRequestCount,
+    );
+  });
+  it('routes table delete actions through the existing confirmation dialog', async () => {
+    const closed = new Subject<WishDialogResult>();
+    const open = vi.spyOn(TestBed.inject(MatDialog), 'open').mockReturnValue({
+      afterClosed: () => closed,
+      close: vi.fn(),
+    } as never);
+    const fixture = TestBed.createComponent(WishListPage);
+    await fixture.whenStable();
+    wishes.next([own, other]);
+    wishes.complete();
+    fixture.componentInstance.viewMode.set('table');
+    await fixture.whenStable();
+    const element = fixture.nativeElement as HTMLElement;
+    element.querySelector<HTMLButtonElement>('.delete-action')?.click();
+    expect(open).toHaveBeenCalledOnce();
+    expect(fixture.componentInstance.data()?.wishes).toHaveLength(2);
+    closed.next({ mode: 'delete', wishId: own.id });
+    closed.complete();
+    await fixture.whenStable();
+    expect(element.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(element.querySelector('tbody')?.textContent).toContain('Headphones');
+  });
 });

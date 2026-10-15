@@ -1,0 +1,85 @@
+<div
+  class="table-scroll"
+  role="region"
+  [attr.aria-label]="content.view.tableLabel"
+  tabindex="0"
+>
+  <table>
+    <caption class="visually-hidden">
+      {{ content.view.tableLabel }}
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">{{ content.view.wish }}</th>
+        <th scope="col">{{ content.view.person }}</th>
+        <th scope="col">{{ content.estimatedPrice }}</th>
+        <th scope="col">{{ content.view.link }}</th>
+        <th scope="col">{{ content.view.actions }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (card of models(); track card.wish.id) {
+      <tr>
+        <th scope="row" class="wish-details">
+          <span class="wish-name">{{ card.wish.name }}</span>
+          <p class="wish-description">{{ card.wish.description }}</p>
+        </th>
+        <td>{{ card.isMine ? content.yours : card.ownerName }}</td>
+        <td class="price">{{ card.price }}</td>
+        <td>
+          @if (card.purchaseHref) {
+          <a
+            mat-stroked-button
+            [href]="card.purchaseHref"
+            target="_blank"
+            rel="noopener noreferrer"
+            [attr.aria-label]="content.openLink + ': ' + card.wish.name"
+            >{{ content.openLink }}</a
+          >
+          } @else if (card.wish.purchaseUrl) {
+          <span>{{ content.invalidStoredUrl }}</span>
+          } @else {
+          <span>{{ content.view.noLink }}</span>
+          }
+        </td>
+        <td>
+          <div class="actions">
+            @if (!card.isMine && card.reserved) {
+            <button mat-flat-button type="button" [disabled]="true">
+              {{ content.view.reserved }}
+            </button>
+            } @else if (!card.isMine && canReserve()) {
+            <a
+              mat-flat-button
+              [routerLink]="['/reservations/new', groupId(), eventId(), card.wish.id]"
+              [attr.aria-label]="content.view.reserve + ': ' + card.wish.name"
+              >{{ content.view.reserve }}</a
+            >
+            } @if (card.canManage) {
+            <button
+              mat-button
+              type="button"
+              [disabled]="disabled()"
+              (click)="editRequested.emit(card.wish)"
+              [attr.aria-label]="content.edit + ': ' + card.wish.name"
+            >
+              {{ content.edit }}
+            </button>
+            <button
+              mat-button
+              class="delete-action"
+              type="button"
+              [disabled]="disabled()"
+              (click)="deleteRequested.emit(card.wish)"
+              [attr.aria-label]="content.delete + ': ' + card.wish.name"
+            >
+              {{ content.delete }}
+            </button>
+            }
+          </div>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>

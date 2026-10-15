@@ -1,5 +1,6 @@
 import { DeleteWishDialog } from '../ui/delete-wish-dialog';
 import { WishCard } from '../ui/wish-card';
+import { WishTable } from '../ui/wish-table';
 import { WishCardModel } from '../models/wish-card.model';
 import { WishesDataService } from '../data-access/wishes-data.service';
 import {
@@ -46,7 +47,13 @@ import {
 @Component({
   selector: 'app-wish-list-page',
   providers: [WishesDataService],
-  imports: [MatButtonModule, RouterLink, MatProgressBarModule, WishCard],
+  imports: [
+    MatButtonModule,
+    RouterLink,
+    MatProgressBarModule,
+    WishCard,
+    WishTable,
+  ],
   templateUrl: './wish-list-page.html',
   styleUrl: './wish-list-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,6 +76,7 @@ export class WishListPage {
   readonly success = signal('');
   readonly dialogOpen = signal(false);
   readonly mineOnly = signal(false);
+  readonly viewMode = signal<'cards' | 'table'>('cards');
   readonly canCreate = computed(
     () =>
       this.data()?.event.status === 'ACTIVE' &&

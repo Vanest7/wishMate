@@ -1,5 +1,18 @@
 import { eventStatusLabels } from '../../shared/domain/event-status';
 export const wishesContent = {
+  view: {
+    label: 'Vista de los deseos',
+    cards: 'Tarjetas',
+    table: 'Tabla',
+    tableLabel: 'Lista de deseos en tabla',
+    wish: 'Deseo',
+    person: 'Persona',
+    link: 'Enlace',
+    actions: 'Acciones',
+    noLink: 'Sin enlace',
+    reserve: 'Reservar regalo',
+    reserved: 'Regalo reservado',
+  },
   title: 'Lista de deseos',
   description:
     'Comparte lo que te haría ilusión y descubre las ideas de los demás.',
