@@ -11,10 +11,11 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { SessionService } from '../core/auth/session.service';
+import { ThemeSelector } from './theme-selector';
 
 @Component({
   selector: 'app-authenticated-layout',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, ThemeSelector],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './authenticated-layout.scss',
   template: `
@@ -50,6 +51,7 @@ import { SessionService } from '../core/auth/session.service';
           >
           <button type="button" (click)="logout()">Cerrar sesión</button>
         </nav>
+        <app-theme-selector />
       </div>
     </header>
     <main id="main-content" tabindex="-1" class="main">

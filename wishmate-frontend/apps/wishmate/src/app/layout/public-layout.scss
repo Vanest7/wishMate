@@ -354,3 +354,8 @@ a:focus-visible {
     transition: none;
   }
 }
+@media (min-width: 901px) {
+  .navigation {
+    margin-left: auto;
+  }
+}

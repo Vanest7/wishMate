@@ -52,7 +52,66 @@ html {
     )
   );
 }
+html[data-theme='dark'] {
+  color-scheme: dark;
 
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$blue-palette,
+        tertiary: mat.$cyan-palette,
+        theme-type: dark,
+      ),
+    )
+  );
+
+  @include mat.theme-overrides(
+    (
+      primary: #a8c7fa,
+      on-primary: #123055,
+      primary-container: #29476c,
+      on-primary-container: #d7e7ff,
+
+      secondary: #6dd6d0,
+      on-secondary: #003735,
+      secondary-container: #124f4d,
+      on-secondary-container: #a6f2ec,
+
+      tertiary: #9bbfbd,
+      on-tertiary: #183635,
+      tertiary-container: #2c4544,
+      on-tertiary-container: #c5dddb,
+
+      background: #111820,
+      on-background: #e2e8f0,
+      surface: #111820,
+      on-surface: #e2e8f0,
+      on-surface-variant: #b6c2d1,
+
+      surface-container-lowest: #0c1219,
+      surface-container-low: #18212b,
+      surface-container: #202b36,
+      surface-container-high: #283340,
+      surface-container-highest: #303c49,
+      surface-bright: #35414e,
+      surface-dim: #111820,
+
+      outline: #8694a5,
+      outline-variant: #3c4a5a,
+
+      inverse-surface: #e2e8f0,
+      inverse-on-surface: #283340,
+      inverse-primary: #365e91,
+
+      error: #ffb4ab,
+      on-error: #690005,
+      error-container: #93000a,
+      on-error-container: #ffdad6,
+    )
+  );
+
+  --color-brand-cream: #423820;
+}
 body {
   margin: 0;
   background: var(--mat-sys-background);
