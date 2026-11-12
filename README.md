@@ -1,13 +1,46 @@
 # WishMate
 
-WishMate is a personal full-stack project built with Angular, Java, Spring Boot, and MariaDB. It helps friends and families organize gift-giving through private groups, shared wish lists, and events. Members can reserve gifts without revealing their identity to the recipient, avoiding duplicate purchases while keeping the surprise.
+WishMate is a personal full-stack project built with Angular, Java, Spring Boot, and MariaDB. It helps friends and families organize gift-giving through private groups, shared wish lists, and events. Members can reserve gifts to avoid duplicate purchases. Wish owners cannot see whether their gifts have been reserved.
 
-This guide covers the backend and its local development workflow. Angular integration is a separate verification step.
+## Live demo
+
+[Open WishMate on Netlify](https://wishmateve.netlify.app/auth/login)
+
+Choose **Crear cuenta** on the sign-in page to try it. The frontend runs on Netlify and sends API requests to Spring Boot on Render. The hosted backend or database may need time to wake up after inactivity. If the first request fails, give the service a moment and try again.
+
+## Run locally with Docker
+
+Install Python 3, OpenSSL, and Docker with the Compose v2 plugin. Start Docker Desktop or the Docker Engine. The first run needs internet access to download images and dependencies. Java, Node.js, and MariaDB run inside the containers.
+
+From the repository root, next to `wishmate-schema.sql`, run:
+
+```bash
+python3 run_docker.py
+```
+
+Open [http://localhost:8080/auth/login](http://localhost:8080/auth/login) once the script prints that WishMate is ready. The first build can take several minutes. If port 8080 is already in use, run `python3 run_docker.py up --port 8081` and open [http://localhost:8081/auth/login](http://localhost:8081/auth/login).
+
+| Command | What it does |
+| --- | --- |
+| `python3 run_docker.py up` | Builds the current checkout, starts the containers and waits for the frontend and API. |
+| `python3 run_docker.py logs` | Follows container logs. Press Ctrl+C to exit the log view. |
+| `python3 run_docker.py down` | Removes the containers and keeps the local database volume. |
+
+The script creates database passwords and RSA signing keys on the first run and keeps them under `~/.wishmate-docker/` for that checkout. MariaDB imports `wishmate-schema.sql` and adds the user handle column when it initializes a fresh volume. Nginx serves Angular and forwards `/api/` to Spring Boot on the same origin. The web port is bound to the local machine.
+
+### Try the gift reservation flow
+
+1. Create an account, a group, and an event.
+2. Add a wish to the event.
+3. In a private browser window, create a second account. Use its username to add it to the group from the first account.
+4. From the second account, open the event and reserve the wish. Switch back to the first account to check that the reservation stays hidden from the wish owner.
 
 ## Technology stack
 
 | Component | Project configuration |
 | --- | --- |
+| Frontend | Angular 22.1, Nx, Angular Material, Tailwind CSS, RxJS and Vitest |
+| API client | OpenAPI client generated with ng-openapi-gen |
 | Java | 21 |
 | Spring Boot | 3.5.4 |
 | Persistence | Spring Data JPA / Hibernate |
@@ -29,12 +62,22 @@ This guide covers the backend and its local development workflow. Angular integr
 | `demo/src/main/resources/application.properties` | Shared configuration |
 | `demo/src/main/resources/application-dev.properties` | Development overrides |
 | `demo/src/test/java/` | Automated tests |
-| `bbdd.sql` | Current MariaDB schema export for an empty database |
+| `wishmate-frontend/` | Angular/Nx workspace and generated API client |
+| `wishmate-schema.sql` | MariaDB schema export for an empty database |
+| `run_docker.py` and `compose.wishmate.yaml` | Local container startup and service configuration |
 | `package.json` | npm shortcuts for Maven commands |
 
 Controllers handle HTTP requests and map API DTOs. Domain use cases and services enforce business rules through domain repository interfaces. Persistence implementations adapt those interfaces to the existing DAO/JPA infrastructure.
 
-## Prerequisites
+The Angular app is organized by feature. Pages coordinate data access and UI components. Shared authentication and HTTP handling live under `core/`, and the generated transport client is exposed by the `@wishmate/api-client` Nx library. See the [frontend architecture notes](wishmate-frontend/docs/frontend-architecture.md) for component boundaries and data access.
+
+The [GitHub Actions workflow](.github/workflows/ci.yml) runs frontend and backend checks for `develop` and uploads build artifacts.
+
+## Manual backend setup
+
+Use the following steps to run Spring Boot directly for development, including Swagger, API tests and CORS checks. If the Docker setup is running on port 8080, stop it or use a different port before starting the backend directly.
+
+### Prerequisites
 
 - JDK 21 available to both IntelliJ and the terminal.
 - A running MariaDB server and the MariaDB command-line client.
@@ -54,13 +97,13 @@ npm --version
 
 A global Maven installation is not required. The npm scripts use Bash and are intended for the Ubuntu development environment. No `npm install` is required for the command-only package.json.
 
-## 1. Prepare MariaDB
+### 1. Prepare MariaDB
 
-### Existing development database
+#### Existing development database
 
 If `regalos_db` already contains the current schema, use that database and skip initialization. Do not import the schema over existing application tables.
 
-### New local installation
+#### New local installation
 
 The following steps are for a new, empty database. Run the commands from the repository root. On Ubuntu installations with socket-authenticated administration, open an administrative session with:
 
@@ -79,8 +122,11 @@ CREATE DATABASE regalos_db
 Exit the SQL client, then import the current schema using an administrative account:
 
 ```bash
-sudo mariadb regalos_db < bbdd.sql
+sudo mariadb regalos_db < wishmate-schema.sql
+sudo mariadb regalos_db < docker/02-user-handle.sql
 ```
+
+The second command adds the unique public handle column used by account registration. For an existing database, check the schema before applying the [user handle migration](demo/USER_HANDLE_MIGRATION.sql).
 
 The current export defines these tables:
 
@@ -115,7 +161,7 @@ spring.jpa.hibernate.ddl-auto=none
 
 The application does not create or migrate the schema automatically. Future schema changes must be applied explicitly.
 
-## 2. Prepare JWT keys
+### 2. Prepare JWT keys
 
 The default key locations are:
 
@@ -143,7 +189,7 @@ fi
 
 Both keys must belong to the same pair. The current implementation loads an unencrypted PEM private key; protect it with filesystem permissions and keep it outside the repository. Replacing the key pair invalidates previously issued access tokens.
 
-## 3. Configure environment variables
+### 3. Configure environment variables
 
 | Variable | Required / default | Purpose |
 | --- | --- | --- |
@@ -159,7 +205,7 @@ Outside the `dev` profile, `DB_URL` has no fallback and CORS has no allowed orig
 
 **The database URL must start with `jdbc:`.** `mariadb://localhost:3306/regalos_db` is not a valid JDBC URL for this configuration. An explicitly defined `DB_URL` overrides the development fallback.
 
-### IntelliJ IDEA
+#### IntelliJ IDEA
 
 In **Run → Edit Configurations**, add the variables to the configuration you actually execute:
 
@@ -171,7 +217,7 @@ These are independent configurations. Variables set in one are not automatically
 
 For custom key locations, use full resource paths, for example `file:/absolute/path/jwt-private.pem`. Avoid storing credentials in shared run configurations committed to Git.
 
-### Bash terminal
+#### Bash terminal
 
 Set the variables in the terminal where you will run Maven or npm:
 
@@ -191,9 +237,9 @@ The password prompt does not echo the password. These exports apply to the curre
 
 The adopted setup uses environment variables. It does **not** automatically load a `.env` file. Do not add credentials or private keys to Git.
 
-## 4. Run the backend
+### 4. Run the backend
 
-### Using npm
+#### Using npm
 
 From the repository root, with the environment configured:
 
@@ -203,7 +249,7 @@ npm start
 
 The scripts supplied for development activate the `dev` profile. When using an IntelliJ npm run configuration, set its environment variables as described above.
 
-### Using Maven directly
+#### Using Maven directly
 
 From the repository root, enter the backend directory:
 
@@ -214,13 +260,13 @@ bash ./mvnw spring-boot:run
 
 This direct command requires `SPRING_PROFILES_ACTIVE=dev` in the environment for development defaults.
 
-### Using IntelliJ
+#### Using IntelliJ
 
 Run `com.gifts.demo.GiftsApplication` using JDK 21 and the configured environment.
 
 The default HTTP address is [http://localhost:8080](http://localhost:8080). Look for `Started GiftsApplication` in the log, then execute an authenticated read to confirm database access. A startup message alone does not exercise every API path.
 
-## 5. Build and run tests
+### 5. Build and run tests
 
 Run npm commands from the repository root:
 
@@ -244,7 +290,7 @@ bash ./mvnw test -Dtest=AuthControllerTest
 bash ./mvnw clean package
 ```
 
-`GiftsApplicationTests` uses `@SpringBootTest` and loads the complete application context. It requires valid datasource settings, an available database and readable JWT keys. Many other tests use mocks or MVC slices, so passing an individual test does not prove the full context can start. The current setup uses the configured development database; it does not provision a dedicated test database automatically.
+`GiftsApplicationTests` checks that the application entry-point class is loadable. Other tests exercise focused behavior with mocks and MVC slices. Use the startup and end-to-end steps in this guide to verify the API against a running MariaDB database.
 
 Test reports are generated under `demo/target/surefire-reports/`.
 
@@ -256,12 +302,12 @@ java -jar demo/target/demo-0.0.1-SNAPSHOT.jar
 
 Run this from the repository root with the same environment variables. Stop any existing backend first to avoid a port conflict. This command is a packaging workflow; do not assume it has been validated merely because IDE startup works.
 
-## 6. Use Swagger and authentication
+### 6. Use Swagger and authentication
 
 - [Swagger UI](http://localhost:8080/swagger-ui/index.html)
 - [OpenAPI JSON](http://localhost:8080/v3/api-docs)
 
-### Authenticate in Swagger
+#### Authenticate in Swagger
 
 1. Execute `GET /api/auth/csrf` from Swagger. The response contains `headerName` and `token`; the browser also receives the matching `XSRF-TOKEN` cookie.
 2. Open **Authorize** and paste the returned JSON token into `csrfToken`.
@@ -289,9 +335,9 @@ Use the JSON token returned by the CSRF endpoint, not a token copied from an unr
 
 Login and CSRF responses use `Cache-Control: no-store`. If an access token expires, log in again and replace it in Swagger. Refresh/logout endpoints are not exposed by the reviewed AuthController.
 
-### Response documentation
+#### Response documentation
 
-The six controllers document 30 operations. Success responses use the existing response DTOs; list endpoints return arrays, and `204` responses have no body. `Location` is documented only where a controller sets it.
+Swagger lists the current operations and their documented responses. Success responses use the existing response DTOs; list endpoints return arrays, and `204` responses have no body. `Location` is documented only where a controller sets it.
 
 Application errors handled by `ApiExceptionHandler` use this shape:
 
@@ -311,25 +357,27 @@ Invalid event states currently produce `400`. Duplicate reservations produce `40
 
 `springdoc.override-with-generic-response=false` keeps the explicitly documented operation responses instead of adding every global handler response to every endpoint.
 
-## API overview
+### API overview
 
 Replace path placeholders with the IDs returned by earlier requests.
 
 | Area | Operations |
 | --- | --- |
 | Authentication | `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/csrf` |
+| Users | `GET /api/users/search` |
 | Groups | `POST` and `GET /api/groups`; `GET`, `PATCH`, `DELETE /api/groups/{groupId}` |
 | Memberships | `GET` and `POST /api/groups/{groupId}/members`; `PATCH` and `DELETE /api/groups/{groupId}/members/{userId}`; `DELETE /api/groups/{groupId}/members/me` |
 | Events | `POST` and `GET /api/groups/{groupId}/events`; `GET` and `PUT /api/groups/{groupId}/events/{eventId}` |
 | Event lifecycle | `POST /api/groups/{groupId}/events/{eventId}/activate`, `/close`, `/archive` |
 | Wishes | `POST` and `GET /api/groups/{groupId}/events/{eventId}/wishes`; `GET`, `PUT`, `DELETE /api/groups/{groupId}/events/{eventId}/wishes/{wishId}` |
+| Wish reservation status | `GET /api/groups/{groupId}/events/{eventId}/wishes/{wishId}/reservation-status` |
 | Member wishes | `GET /api/groups/{groupId}/events/{eventId}/wishes/user/{userId}` |
 | Reservations | `POST` and `DELETE /api/reservations/groups/{groupId}/events/{eventId}/wishes/{wishId}` |
 | Own reservations | `GET /api/reservations`, `GET /api/reservations/{reservationId}` |
 
 The reservation creation response currently uses the creation request URI as `Location`. Read a reservation using `GET /api/reservations/{reservationId}` and the returned reservation ID.
 
-## 7. CORS verification
+### 7. CORS verification
 
 Development allows `http://localhost:4200` by default. Allowed origins can be overridden through `CORS_ALLOWED_ORIGINS`. The configuration permits credentials and the `Authorization`, `Content-Type` and `X-XSRF-TOKEN` request headers.
 
@@ -351,7 +399,7 @@ Access-Control-Allow-Credentials: true
 
 Repeat with `Origin: http://localhost:4300`; expect `403` unless that origin was explicitly allowed. These checks validate backend preflight handling, not the complete Angular integration. The frontend must also send the required credentials and CSRF header on relevant requests.
 
-## 8. End-to-end verification
+### 8. End-to-end verification
 
 Use disposable data and keep the two users in separate browser sessions. Authenticate both through the Swagger flow above.
 
@@ -366,7 +414,7 @@ Use disposable data and keep the two users in separate browser sessions. Authent
 9. Restart the backend, authenticate again if necessary, then retrieve the group, wish and B's reservation. Expect `200` and persisted values.
 10. As B, cancel the reservation; as A, delete only the test group. Expect `204` for both. Any test user account created for this flow remains in the database.
 
-This backend flow was reported as successful in local development during SCRUM-23. A fresh-database installation and browser requests from Angular remain separate verification tasks. This guide does not claim an automated end-to-end test suite or a recorded total passing-test count.
+This backend flow was reported as successful in local development during SCRUM-23. To verify the same behavior through Angular, follow [the gift reservation flow](#try-the-gift-reservation-flow) in the Docker section.
 
 ## Troubleshooting
 
@@ -382,7 +430,7 @@ This backend flow was reported as successful in local development during SCRUM-2
 | `401` from a protected endpoint | Log in again and authorize the current JWT. |
 | `403` on a write | Check CSRF header/cookie pairing and the operation's membership/ownership rules. |
 | CSRF test passes alone but returns `X-CSRF-TOKEN` in the suite | `.with(csrf())` can alter the shared test repository. The real-cookie contract test uses `@DirtiesContext(methodMode = BEFORE_METHOD)` and checks `XSRF-TOKEN`. |
-| `GiftsApplicationTests` fails while slice tests pass | The full context needs a real configured datasource and JWT keys. Read the deepest `Caused by` entry. |
+| Spring Boot fails on startup | Read the deepest `Caused by` entry and verify the datasource settings and JWT key files. |
 | Duplicate `corsConfig` bean | Keep the configuration in `common.cors.CorsConfig`; do not add a second class with the same bean name. |
 
 ### Known schema/application difference

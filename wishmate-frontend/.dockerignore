@@ -1,0 +1,9 @@
+.git
+node_modules
+dist
+.nx
+.angular
+coverage
+.env
+.env.*
+*.pem
